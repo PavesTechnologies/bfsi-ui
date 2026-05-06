@@ -23,69 +23,91 @@ const defaultFormData = {
   loan: {
     loan_type: "personal",
     credit_type: "individual",
-    loan_purpose: "Purchase of house",
-    requested_amount: "10000",
-    requested_term_months: "240",
+    loan_purpose: "home_improvement",
+    requested_amount: "100000",
+    requested_term_months: "24",
     preferred_payment_day: "5",
-    origination_channel: "online",
+    origination_channel: "web",
     application_status: "submitted",
   },
   applicant: {
     applicant_role: "primary",
-    first_name: "John",
-    middle_name: "A.",
-    last_name: "Doe",
+    first_name: "Rahul",
+    middle_name: "",
+    last_name: "Mishra",
     suffix: "Mr.",
-    date_of_birth: "1988-10-17",
+    date_of_birth: "1997-01-30",
     gender: "MALE",
-    phone_number: "555-123-4567",
-    ssn_no: "555-45-6789",
-    ssn_last4: "6789",
-    itin_number: "",
-    citizenship_status: "US Citizen",
-    email: `john${Date.now()}@example.com`,  // new email every time to avoid backend duplicate checks during development
+    phone_number: "+919876543210",
+    pan_number: "ELWPM8089J",
+    aadhaar_no: "123456789012",
+    father_name: "Sutendra Mishra",
+    mother_name: "Sunita Mishra",
+    citizenship_status: "citizen",
+    email: `rahul${Date.now()}@example.com`, // new email every time to avoid backend duplicate checks during development
     addresses: [
       {
-        address_type: "permanent",
-        address_line1: "123 Main St",
+        address_type: "current",
+        address_line1: "123 Main Street",
         address_line2: "Apt 4B",
-        city: "Metropolis",
-        state: "NY",
-        zip_code: "10001",
-        country: "USA",
-        housing_status: "own",
+        city: "Mumbai",
+        state: "MH",
+        zip_code: "100010",
+        country: "India",
+        housing_status: "rent",
         years_at_address: "3",
-        months_at_address: "0",
+        months_at_address: "6",
       },
     ],
     employment: {
       employment_type: "salaried",
-      employment_status: "employed",
-      employer_name: "Acme Corp",
+      employment_status: "active",
+      employer_name: "Tech Corp",
       job_title: "Software Engineer",
-      start_date: "2015-06-01",
+      start_date: "2020-01-10",
       end_date: "",
-      income: "120000",
-      employer_phone: "555-987-6543",
-      employer_address: "456 Corporate Blvd, Metropolis, NY 10002",
-      experience: "5",
-      gross_monthly_income: "10000",
+      employer_phone: "+919876543211",
+      employer_address: "456 Corporate Blvd, Mumbai",
+      experience: "4",
+      gross_monthly_income: "5000",
     },
     incomes: [
       {
-        income_type: "salary",
-        description: "Primary job income",
-        monthly_amount: "10000",
-        income_frequency: "monthly",
-      }
+        income_type: "bonus",
+        description: "Annual Performance Bonus",
+        monthly_amount: "800",
+        income_frequency: "annual",
+      },
     ],
-    assets: [{
-      asset_type: "checking",
-      "institution_name": "Bank of Metropolis",
-      "value": "15000",
-      "ownership_type": "individual",
-    }],
-    liabilities: [],
+    assets: [
+      {
+        asset_type: "savings",
+        institution_name: "State Bank of India",
+        value: "15000",
+        ownership_type: "individual",
+      },
+      {
+        asset_type: "investment",
+
+        institution_name: "Zerodha",
+
+        value: 45000.0,
+
+        ownership_type: "joint",
+      },
+    ],
+    liabilities: [
+      {
+        liability_type: "auto_loan",
+        creditor_name: "HDFC Bank",
+        outstanding_balance: "12000",
+        monthly_payment: "350",
+        months_remaining: "36",
+        co_signed: false,
+        federal_debt: false,
+        delinquent: false,
+      },
+    ],
   },
   documents: {},
 };
@@ -112,9 +134,10 @@ const initialFormData = isFillDefaults
         date_of_birth: "",
         gender: "",
         phone_number: "",
-        ssn_no: "",
-        ssn_last4: "",
-        itin_number: "",
+        pan_number: "",
+        aadhaar_no: "",
+        father_name: "",
+        mother_name: "",
         citizenship_status: "",
         email: "",
         addresses: [],
@@ -228,9 +251,13 @@ const LoanIntake = () => {
       applicants: [
         {
           ...formData.applicant,
-          ssn_no: formData.applicant.ssn_no,
-          ssn_last4: formData.applicant.ssn_no
-            ? formData.applicant.ssn_no.replace(/\D/g, "").slice(-4)
+          pan_number: formData.applicant.pan_number,
+          pan_last4: formData.applicant.pan_number
+            ? formData.applicant.pan_number.slice(-4)
+            : "",
+          aadhaar_no: formData.applicant.aadhaar_no,
+          aadhaar_last4: formData.applicant.aadhaar_no
+            ? formData.applicant.aadhaar_no.replace(/\D/g, "").slice(-4)
             : "",
           employment:
             Object.keys(formData.applicant.employment || {}).length === 0
@@ -330,17 +357,24 @@ const LoanIntake = () => {
 
   const handleDecisionConfirm = useCallback(
     async (selectedTerms) => {
-      const approvedAmount = Number(selectedTerms.amount || selectedTerms.approved_amount || 0);
+      const approvedAmount = Number(
+        selectedTerms.amount || selectedTerms.approved_amount || 0,
+      );
       const payload = {
         application_id: applicationId,
         approved_amount: approvedAmount,
-        approved_tenure_months: Number(selectedTerms.term_months || selectedTerms.approved_tenure_months || 0),
+        approved_tenure_months: Number(
+          selectedTerms.term_months ||
+            selectedTerms.approved_tenure_months ||
+            0,
+        ),
         interest_rate: Number(selectedTerms.interest_rate || 0),
         disbursement_amount: Number(
           selectedTerms.disbursement_amount ||
-          (approvedAmount - (approvedAmount * 0.02))
+            approvedAmount - approvedAmount * 0.02,
         ),
-        explanation: selectedTerms.terms_summary || selectedTerms.description || null,
+        explanation:
+          selectedTerms.terms_summary || selectedTerms.description || null,
       };
 
       setDisbursementLoading(true);
@@ -350,7 +384,10 @@ const LoanIntake = () => {
         toast.success("Funds disbursed successfully!");
       } catch (error) {
         console.error("Disbursement failed:", error);
-        toast.error(error.response?.data?.detail || "Disbursement failed. Please try again.");
+        toast.error(
+          error.response?.data?.detail ||
+            "Disbursement failed. Please try again.",
+        );
       } finally {
         setDisbursementLoading(false);
       }
@@ -409,7 +446,10 @@ const LoanIntake = () => {
     if (disbursementReceipt) {
       return (
         <div style={{ minHeight: "100vh", padding: "var(--spacing-2xl)" }}>
-          <DisbursementReceiptScreen receipt={disbursementReceipt} onReset={resetApplication} />
+          <DisbursementReceiptScreen
+            receipt={disbursementReceipt}
+            onReset={resetApplication}
+          />
         </div>
       );
     }
@@ -418,15 +458,28 @@ const LoanIntake = () => {
       return (
         <div style={{ minHeight: "100vh", padding: "var(--spacing-2xl)" }}>
           <div className="pipeline-shell fade-in">
-            <div className="card decision-screen" style={{ textAlign: "center" }}>
+            <div
+              className="card decision-screen"
+              style={{ textAlign: "center" }}
+            >
               <div className="decision-hero">
                 <span className="decision-badge">Processing</span>
                 <h2 className="card-title">Disbursing Funds</h2>
-                <p className="card-subtitle">Executing fund transfer and generating your receipt…</p>
+                <p className="card-subtitle">
+                  Executing fund transfer and generating your receipt…
+                </p>
               </div>
-              <div style={{ margin: "var(--spacing-xl) auto", width: 40, height: 40,
-                border: "3px solid var(--border-color)", borderTopColor: "var(--primary-color)",
-                borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+              <div
+                style={{
+                  margin: "var(--spacing-xl) auto",
+                  width: 40,
+                  height: 40,
+                  border: "3px solid var(--border-color)",
+                  borderTopColor: "var(--primary-color)",
+                  borderRadius: "50%",
+                  animation: "spin 0.8s linear infinite",
+                }}
+              />
             </div>
           </div>
         </div>

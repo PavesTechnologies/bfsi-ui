@@ -5,13 +5,44 @@ import '../../styles/components.css';
 
 const AddressInfo = ({ formData, onChange }) => {
     const [addresses, setAddresses] = useState(formData.addresses || []);
-    const STATE_CODES = [
-  "AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA",
-  "HI","ID","IL","IN","IA","KS","KY","LA","ME","MD",
-  "MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ",
-  "NM","NY","NC","ND","OH","OK","OR","PA","RI","SC",
-  "SD","TN","TX","UT","VT","VA","WA","WV","WI","WY"
-];
+    const INDIAN_STATES = [
+        { value: 'AP', label: 'Andhra Pradesh' },
+        { value: 'AR', label: 'Arunachal Pradesh' },
+        { value: 'AS', label: 'Assam' },
+        { value: 'BR', label: 'Bihar' },
+        { value: 'CG', label: 'Chhattisgarh' },
+        { value: 'GA', label: 'Goa' },
+        { value: 'GJ', label: 'Gujarat' },
+        { value: 'HR', label: 'Haryana' },
+        { value: 'HP', label: 'Himachal Pradesh' },
+        { value: 'JH', label: 'Jharkhand' },
+        { value: 'KA', label: 'Karnataka' },
+        { value: 'KL', label: 'Kerala' },
+        { value: 'MP', label: 'Madhya Pradesh' },
+        { value: 'MH', label: 'Maharashtra' },
+        { value: 'MN', label: 'Manipur' },
+        { value: 'ML', label: 'Meghalaya' },
+        { value: 'MZ', label: 'Mizoram' },
+        { value: 'NL', label: 'Nagaland' },
+        { value: 'OD', label: 'Odisha' },
+        { value: 'PB', label: 'Punjab' },
+        { value: 'RJ', label: 'Rajasthan' },
+        { value: 'SK', label: 'Sikkim' },
+        { value: 'TN', label: 'Tamil Nadu' },
+        { value: 'TS', label: 'Telangana' },
+        { value: 'TR', label: 'Tripura' },
+        { value: 'UP', label: 'Uttar Pradesh' },
+        { value: 'UK', label: 'Uttarakhand' },
+        { value: 'WB', label: 'West Bengal' },
+        { value: 'AN', label: 'Andaman and Nicobar Islands' },
+        { value: 'CH', label: 'Chandigarh' },
+        { value: 'DN', label: 'Dadra and Nagar Haveli and Daman and Diu' },
+        { value: 'DL', label: 'Delhi' },
+        { value: 'JK', label: 'Jammu and Kashmir' },
+        { value: 'LA', label: 'Ladakh' },
+        { value: 'LD', label: 'Lakshadweep' },
+        { value: 'PY', label: 'Puducherry' },
+    ];
 
 
     const addressTypeOptions = [
@@ -32,7 +63,7 @@ const AddressInfo = ({ formData, onChange }) => {
             city: '',
             state: '',
             zip_code: '',
-            country: 'USA',
+            country: 'India',
             housing_status: '',
             years_at_address: '',
             months_at_address: ''
@@ -113,24 +144,19 @@ const AddressInfo = ({ formData, onChange }) => {
                         <Select
                             label="State"
                             value={address.state}
-                            options={STATE_CODES.map((state) => ({ value: state, label: state }))}
-                            onChange={(e) => {
-
-                        
-                                updateAddress(index, 'state', e.target.value);
-                            }}
+                            options={INDIAN_STATES}
+                            onChange={(e) => updateAddress(index, 'state', e.target.value)}
                             required
                         />
 
-
-
                         <Input
-                            label="ZIP Code"
-                            value={address.zip_code}
+                            label="PIN Code"
+                            value={address.zip_code || ''}
                             onChange={(e) => {
                                 const onlyNumbers = e.target.value.replace(/[^0-9]/g, '');
-                                updateAddress(index, 'zip_code', onlyNumbers)
+                                updateAddress(index, 'zip_code', onlyNumbers);
                             }}
+                            maxLength="6"
                             required
                         />
                     </div>

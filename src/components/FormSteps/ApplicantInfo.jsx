@@ -139,32 +139,50 @@ onChange={(e) => {
 
             <div className="form-grid-2">
                 <Input
-                    label="SSN "
-                    name="ssn_no"
-                    value={formData.ssn_no || ''}
-
+                    label="PAN Number"
+                    name="pan_number"
+                    value={formData.pan_number || ''}
                     onChange={(e) => {
-    const onlyNumbers = e.target.value.replace(/[^0-9 -]/g, '');
-    
-    onChange({
-      target: {
-        name: "ssn_no",
-        value: onlyNumbers
-      }
-    });
-    }}
-                    placeholder="XXX-XX-XXXX"
-                    maxLength="11"
-                    pattern="[0-9]"
+                        const filtered = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+                        onChange({ target: { name: 'pan_number', value: filtered } });
+                    }}
+                    placeholder="ABCDE1234F"
+                    maxLength="10"
                     required
                 />
 
                 <Input
-                    label="ITIN Number"
-                    name="itin_number"
-                    value={formData.itin_number || ''}
-                    onChange={onChange}
-                    placeholder="Optional"
+                    label="Aadhaar Number"
+                    name="aadhaar_no"
+                    value={formData.aadhaar_no || ''}
+                    onChange={(e) => {
+                        const onlyNumbers = e.target.value.replace(/[^0-9]/g, '');
+                        onChange({ target: { name: 'aadhaar_no', value: onlyNumbers } });
+                    }}
+                    placeholder="12-digit Aadhaar number"
+                    maxLength="12"
+                    required
+                />
+            </div>
+
+            <div className="form-grid-2">
+                <Input
+                    label="Father's Name"
+                    name="father_name"
+                    value={formData.father_name || ''}
+                    onChange={(e) => {
+                        const filtered = e.target.value.replace(/[^a-zA-Z ]/g, '');
+                        onChange({ target: { name: 'father_name', value: filtered } });
+                    }}
+                />
+                <Input
+                    label="Mother's Name"
+                    name="mother_name"
+                    value={formData.mother_name || ''}
+                    onChange={(e) => {
+                        const filtered = e.target.value.replace(/[^a-zA-Z ]/g, '');
+                        onChange({ target: { name: 'mother_name', value: filtered } });
+                    }}
                 />
             </div>
 
@@ -174,7 +192,7 @@ onChange={(e) => {
                     name="citizenship_status"
                     value={formData.citizenship_status || ''}
                     onChange={onChange}
-                    placeholder="e.g., US Citizen, Permanent Resident"
+                    placeholder="e.g., Indian Citizen, NRI, OCI"
                 />
 
                 <Input
