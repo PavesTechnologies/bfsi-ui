@@ -41,7 +41,7 @@ const defaultFormData = {
     date_of_birth: "1997-01-30",
     gender: "MALE",
     phone_number: "+919876543210",
-    pan_number: "ELWPM8089J",
+    pan_number: "ABDCP0001F",
     aadhaar_no: "123456789012",
     father_name: "Sutendra Mishra",
     mother_name: "Sunita Mishra",
