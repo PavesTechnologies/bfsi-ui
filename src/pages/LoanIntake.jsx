@@ -15,7 +15,9 @@ import DocumentUpload from "../components/FormSteps/DocumentUpload";
 import DecisionScreen from "../components/Pipeline/DecisionScreen";
 import DisbursementReceiptScreen from "../components/Pipeline/DisbursementReceiptScreen";
 import PipelineScreen from "../components/Pipeline/PipelineScreen";
+import SignatureScreen from "../components/Pipeline/SignatureScreen";
 import { callDisburse } from "../api/disbursementApi";
+import orchestratorClient from "../api/orchestratorClient";
 import "../styles/components.css";
 import "../styles/pipeline.css";
 
@@ -169,6 +171,8 @@ const LoanIntake = () => {
   const [pipelineDecision, setPipelineDecision] = useState(null);
   const [disbursementLoading, setDisbursementLoading] = useState(false);
   const [disbursementReceipt, setDisbursementReceipt] = useState(null);
+  const [pipelinePhase, setPipelinePhase] = useState(null); // 'awaiting_signature' | null
+  const [acceptedTerms, setAcceptedTerms] = useState(null);
 
   const resetApplication = useCallback(() => {
     setApplicationId(null);
@@ -177,6 +181,8 @@ const LoanIntake = () => {
     setPipelineDecision(null);
     setDisbursementLoading(false);
     setDisbursementReceipt(null);
+    setPipelinePhase(null);
+    setAcceptedTerms(null);
     setCurrentStep(0);
     setFormData(initialFormData);
   }, []);
@@ -357,6 +363,25 @@ const LoanIntake = () => {
 
   const handleDecisionConfirm = useCallback(
     async (selectedTerms) => {
+      if (pipelineDecision?.isHITLBankDecision) {
+        // HITL flow: accept bank offer → show signature screen
+        setDisbursementLoading(true);
+        try {
+          await orchestratorClient.post(`/pipeline/${applicationId}/accept`);
+          setAcceptedTerms(selectedTerms);
+          setPipelinePhase("awaiting_signature");
+        } catch (error) {
+          console.error("Accept failed:", error);
+          toast.error(
+            error.response?.data?.detail || "Failed to accept offer. Please retry.",
+          );
+        } finally {
+          setDisbursementLoading(false);
+        }
+        return;
+      }
+
+      // Legacy direct-disbursement flow (non-HITL / demo)
       const approvedAmount = Number(
         selectedTerms.amount || selectedTerms.approved_amount || 0,
       );
@@ -392,13 +417,20 @@ const LoanIntake = () => {
         setDisbursementLoading(false);
       }
     },
-    [applicationId],
+    [applicationId, pipelineDecision],
   );
 
-  const handleDecisionDecline = useCallback(() => {
+  const handleDecisionDecline = useCallback(async () => {
+    if (pipelineDecision?.isHITLBankDecision) {
+      try {
+        await orchestratorClient.post(`/pipeline/${applicationId}/decline`);
+      } catch {
+        // best-effort; pipeline state will eventually expire
+      }
+    }
     toast.info("All offers declined. Starting a new application.");
     resetApplication();
-  }, [resetApplication]);
+  }, [applicationId, pipelineDecision, resetApplication]);
 
   const renderStep = () => {
     switch (currentStep) {
@@ -442,18 +474,33 @@ const LoanIntake = () => {
     }
   };
 
-  if (applicationId && pipelineComplete && pipelineDecision) {
-    if (disbursementReceipt) {
-      return (
-        <div style={{ minHeight: "100vh", padding: "var(--spacing-2xl)" }}>
-          <DisbursementReceiptScreen
-            receipt={disbursementReceipt}
-            onReset={resetApplication}
-          />
-        </div>
-      );
-    }
+  if (disbursementReceipt) {
+    return (
+      <div style={{ minHeight: "100vh", padding: "var(--spacing-2xl)" }}>
+        <DisbursementReceiptScreen
+          receipt={disbursementReceipt}
+          onReset={resetApplication}
+        />
+      </div>
+    );
+  }
 
+  if (applicationId && pipelinePhase === "awaiting_signature") {
+    return (
+      <div style={{ minHeight: "100vh", padding: "var(--spacing-2xl)" }}>
+        <SignatureScreen
+          applicationId={applicationId}
+          terms={acceptedTerms}
+          onComplete={(receipt) => {
+            setDisbursementReceipt(receipt);
+            setPipelinePhase(null);
+          }}
+        />
+      </div>
+    );
+  }
+
+  if (applicationId && pipelineComplete && pipelineDecision) {
     if (disbursementLoading) {
       return (
         <div style={{ minHeight: "100vh", padding: "var(--spacing-2xl)" }}>
@@ -464,9 +511,15 @@ const LoanIntake = () => {
             >
               <div className="decision-hero">
                 <span className="decision-badge">Processing</span>
-                <h2 className="card-title">Disbursing Funds</h2>
+                <h2 className="card-title">
+                  {pipelineDecision?.isHITLBankDecision
+                    ? "Accepting Offer"
+                    : "Disbursing Funds"}
+                </h2>
                 <p className="card-subtitle">
-                  Executing fund transfer and generating your receipt…
+                  {pipelineDecision?.isHITLBankDecision
+                    ? "Confirming your acceptance with the bank…"
+                    : "Executing fund transfer and generating your receipt…"}
                 </p>
               </div>
               <div

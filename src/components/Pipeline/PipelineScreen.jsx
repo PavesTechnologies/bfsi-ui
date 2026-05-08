@@ -42,6 +42,54 @@ const getElapsed = (data) => {
 const normalizeTerminalDecision = (data) => {
   const details = data?.details || {};
 
+  // HITL: bank has reviewed and sends decision to applicant
+  if (data.event === "awaiting_applicant_response") {
+    const fd = details.final_decision;
+    const decision =
+      fd === "APPROVE"
+        ? "APPROVED"
+        : fd === "DECLINE"
+          ? "DECLINED"
+          : fd === "COUNTER_OFFER"
+            ? "COUNTER_OFFER"
+            : "DECISION_COMPLETE";
+
+    const approvedTerms =
+      decision === "APPROVED"
+        ? {
+            amount: details.approved_amount,
+            term_months: details.tenure_months,
+            interest_rate: details.interest_rate,
+            monthly_payment: details.monthly_emi,
+            terms_summary: `Loan of ₹${Number(details.approved_amount ?? 0).toLocaleString("en-IN")} at ${details.interest_rate}% for ${details.tenure_months} months. EMI: ₹${Number(details.monthly_emi ?? 0).toLocaleString("en-IN")}/month.`,
+          }
+        : null;
+
+    const rawOpts = details.counter_offer_options ?? [];
+    const counterOfferOptions = rawOpts.map((opt) => ({
+      option_id: opt.option_id,
+      description: opt.description,
+      amount: opt.proposed_amount,
+      term_months: opt.proposed_tenure_months,
+      interest_rate: opt.proposed_interest_rate,
+      monthly_payment: opt.monthly_payment_emi,
+      disbursement_amount: opt.disbursement_amount,
+      total_repayment: opt.total_repayment,
+    }));
+
+    return {
+      decision,
+      isHITLBankDecision: true,
+      reason:
+        decision === "APPROVED"
+          ? "Bank has approved your loan application."
+          : "Bank has reviewed your application and provided an offer.",
+      approvedTerms,
+      counterOfferOptions: counterOfferOptions.length > 0 ? counterOfferOptions : null,
+      application_id: data.application_id,
+    };
+  }
+
   const rawDecision =
     details.decision ||
     data.decision ||
@@ -114,6 +162,7 @@ const PipelineScreen = ({ applicationId, onComplete }) => {
     markActive(createInitialStages(PIPELINE_STAGES), 0),
   );
   const [error, setError] = useState(null);
+  const [hitlStatus, setHitlStatus] = useState(null);
 
   useEffect(() => {
     const unsubscribe = subscribeToPipeline(
@@ -121,6 +170,15 @@ const PipelineScreen = ({ applicationId, onComplete }) => {
       // eslint-disable-next-line no-unused-vars
       ({ event, data }) => {
         setError(null);
+
+        // HITL status updates (no stage change, just display)
+        if (data.event === "awaiting_bank_review") {
+          setHitlStatus("Awaiting bank review…");
+        }
+        if (data.event === "bank_decisioning_started") {
+          setHitlStatus("Bank decisioning in progress…");
+        }
+
         const stageIndex = PIPELINE_STAGES.findIndex(
           (stage) => stage.backendStage === data.stage,
         );
@@ -146,6 +204,11 @@ const PipelineScreen = ({ applicationId, onComplete }) => {
                 return completedStages;
               }
 
+              // Don't auto-advance when bank decision is pending applicant response
+              if (data.event === "awaiting_applicant_response") {
+                return completedStages;
+              }
+
               return markActive(completedStages, stageIndex + 1);
             });
           }
@@ -162,12 +225,13 @@ const PipelineScreen = ({ applicationId, onComplete }) => {
           ["APPROVED", "DECLINED", "COUNTER_OFFER"].includes(
             normalizedDecision.decision,
           );
+        const isApplicantResponse = data.event === "awaiting_applicant_response";
 
-        if (!data.is_terminal && !decisioningTerminal) {
+        if (!data.is_terminal && !decisioningTerminal && !isApplicantResponse) {
           return;
         }
 
-        // Keep one-shot behavior: first terminal/decsioning completion triggers next flow
+        // Keep one-shot behavior: first terminal/decisioning completion triggers next flow
         window.setTimeout(() => onComplete(normalizedDecision), 600);
       },
       (subscriptionError) => {
@@ -203,9 +267,10 @@ const PipelineScreen = ({ applicationId, onComplete }) => {
             </p>
           </div>
           <div className="pipeline-status-chip">
-            {activeStage
-              ? `Active: ${activeStage.label}`
-              : "Finalising application"}
+            {hitlStatus ||
+              (activeStage
+                ? `Active: ${activeStage.label}`
+                : "Finalising application")}
           </div>
         </div>
 

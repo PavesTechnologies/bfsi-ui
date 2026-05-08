@@ -28,7 +28,11 @@ const DecisionScreen = ({ decision, onConfirm, onDecline, onReset }) => {
                 terms={terms}
                 isHighlighted
                 onAccept={() => onConfirm(terms)}
-                ctaLabel="Accept & Proceed to Disbursement"
+                ctaLabel={
+                  decision.isHITLBankDecision
+                    ? "Accept & Sign Agreement"
+                    : "Accept & Proceed to Disbursement"
+                }
               />
             </div>
           ) : (
@@ -72,8 +76,12 @@ const DecisionScreen = ({ decision, onConfirm, onDecline, onReset }) => {
                   title={opt.description || `Option ${idx + 1}`}
                   terms={opt}
                   isHighlighted={idx === 0}
-                  ctaLabel="Select This Offer"
                   onAccept={() => onConfirm(opt)}
+                  ctaLabel={
+                    decision.isHITLBankDecision
+                      ? "Accept & Sign Agreement"
+                      : "Select This Offer"
+                  }
                 />
               ))}
             </div>
