@@ -14,7 +14,7 @@ const ReviewSubmit = ({ formData, onEdit }) => {
     // const employee=formData.employee || {};
     const renderSection = (title, data, editStep) => (
         <div style={{
-            background: 'rgba(255, 255, 255, 0.02)',
+            background: 'var(--panel-subtle-bg)',
             border: '1px solid var(--border-color)',
             borderRadius: 'var(--radius-md)',
             padding: 'var(--spacing-lg)',
@@ -82,7 +82,7 @@ const ReviewSubmit = ({ formData, onEdit }) => {
 
             {formData.addresses && formData.addresses.length > 0 && (
                 <div style={{
-                    background: 'rgba(255, 255, 255, 0.02)',
+                    background: 'var(--panel-subtle-bg)',
                     border: '1px solid var(--border-color)',
                     borderRadius: 'var(--radius-md)',
                     padding: 'var(--spacing-lg)',
@@ -167,8 +167,8 @@ const ReviewSubmit = ({ formData, onEdit }) => {
 
 
             <div style={{
-                background: 'rgba(102, 126, 234, 0.05)',
-                border: '1px solid rgba(102, 126, 234, 0.2)',
+                background: 'var(--panel-primary-bg)',
+                border: '1px solid var(--panel-primary-border)',
                 borderRadius: 'var(--radius-md)',
                 padding: 'var(--spacing-lg)',
                 marginTop: 'var(--spacing-xl)'

@@ -25,7 +25,7 @@
     width: 0;
     height: 0;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--button-overlay-bg);
     transform: translate(-50%, -50%);
     transition: width 0.6s, height 0.6s;
 }
@@ -36,35 +36,35 @@
 }
 
 .btn-primary {
-    background: var(--primary-gradient);
-    color: var(--text-primary);
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    background: var(--button-primary-bg);
+    color: var(--button-primary-text);
+    box-shadow: var(--button-primary-shadow);
 }
 
 .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+    box-shadow: var(--button-primary-shadow-hover);
 }
 
 .btn-secondary {
-    background: var(--bg-tertiary);
-    color: var(--text-primary);
+    background: var(--button-secondary-bg);
+    color: var(--button-secondary-text);
     border: 1px solid var(--border-color);
 }
 
 .btn-secondary:hover {
-    background: var(--bg-card);
-    border-color: var(--primary-color);
+    background: var(--button-secondary-bg-hover);
+    border-color: var(--color-primary);
 }
 
 .btn-outline {
     background: transparent;
-    color: var(--primary-color);
-    border: 2px solid var(--primary-color);
+    color: var(--button-outline-text);
+    border: 2px solid var(--button-outline-border);
 }
 
 .btn-outline:hover {
-    background: var(--primary-color);
+    background: var(--color-primary);
     color: var(--text-primary);
 }
 
@@ -118,10 +118,10 @@
 .form-select {
     width: 100%;
     padding: var(--spacing-sm) var(--spacing-md);
-    background: var(--bg-glass);
-    border: 1px solid var(--border-color);
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
     border-radius: var(--radius-md);
-    color: var(--text-primary);
+    color: var(--input-text);
     font-size: var(--font-size-base);
     transition: all var(--transition-base);
     backdrop-filter: blur(10px);
@@ -130,23 +130,23 @@
 .form-input:focus,
 .form-select:focus {
     outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--input-border-focus);
+    box-shadow: var(--shadow-primary-ring);
+    background: var(--input-bg-focus);
 }
 
 .form-input::placeholder {
-    color: var(--text-muted);
+    color: var(--input-placeholder);
 }
 
 .form-input.error,
 .form-select.error {
-    border-color: var(--error-color);
+    border-color: var(--input-error-border);
 }
 
 .form-input.error:focus,
 .form-select.error:focus {
-    box-shadow: 0 0 0 3px rgba(245, 87, 108, 0.1);
+    box-shadow: var(--shadow-error-ring);
 }
 
 .form-error {
@@ -173,7 +173,7 @@
 .form-select {
     cursor: pointer;
     appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23b8b8d1' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-image: var(--select-indicator-icon);
     background-repeat: no-repeat;
     background-position: right var(--spacing-md) center;
     padding-right: calc(var(--spacing-md) * 2.5);
@@ -191,18 +191,18 @@
 
 /* Card Component */
 .card {
-    background: var(--bg-card);
+    background: var(--card-bg);
     backdrop-filter: blur(20px);
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--card-border);
     border-radius: var(--radius-lg);
     padding: var(--spacing-xl);
-    box-shadow: var(--shadow-md);
+    box-shadow: var(--card-shadow);
     transition: all var(--transition-base);
 }
 
 .card:hover {
-    border-color: rgba(255, 255, 255, 0.15);
-    box-shadow: var(--shadow-lg);
+    border-color: var(--card-border-hover);
+    box-shadow: var(--card-shadow-hover);
 }
 
 .card-header {
@@ -271,11 +271,11 @@
 }
 
 .stepper-item:hover {
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--panel-subtle-bg-hover);
 }
 
 .stepper-item.active {
-    background: rgba(102, 126, 234, 0.1);
+    background: var(--primary-tint-100);
 }
 
 .stepper-item.completed {
@@ -304,7 +304,7 @@
 .stepper-item.active .stepper-icon {
     background: var(--primary-gradient);
     color: var(--text-primary);
-    box-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
+    box-shadow: var(--shadow-glow);
 }
 
 .stepper-item.completed .stepper-icon {
@@ -331,13 +331,13 @@
 /* Section Divider */
 .section-divider {
     height: 1px;
-    background: linear-gradient(90deg, transparent, var(--border-color), transparent);
+    background: var(--divider-gradient);
     margin: var(--spacing-xl) 0;
 }
 
 /* Dynamic List (for adding/removing items) */
 .dynamic-list-item {
-    background: rgba(255, 255, 255, 0.02);
+    background: var(--panel-subtle-bg);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
     padding: var(--spacing-lg);
@@ -362,25 +362,25 @@
 
 .btn-remove {
     background: transparent;
-    color: var(--error-color);
+    color: var(--button-danger-text);
     padding: var(--spacing-xs) var(--spacing-sm);
     font-size: var(--font-size-sm);
-    border: 1px solid var(--error-color);
+    border: 1px solid var(--button-danger-border);
     border-radius: var(--radius-sm);
     transition: all var(--transition-base);
 }
 
 .btn-remove:hover {
-    background: var(--error-color);
+    background: var(--color-error);
     color: var(--text-primary);
 }
 
 .btn-add {
     background: transparent;
-    color: var(--accent-color);
+    color: var(--button-add-text);
     padding: var(--spacing-sm) var(--spacing-md);
     font-size: var(--font-size-sm);
-    border: 1px dashed var(--accent-color);
+    border: 1px dashed var(--button-add-border);
     border-radius: var(--radius-md);
     transition: all var(--transition-base);
     width: 100%;
@@ -388,7 +388,7 @@
 }
 
 .btn-add:hover {
-    background: rgba(79, 172, 254, 0.1);
+    background: var(--button-add-bg-hover);
     border-style: solid;
 }
 
@@ -427,7 +427,7 @@
 }
 
 .receipt-card {
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--panel-subtle-bg-hover);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
     padding: var(--spacing-lg);
@@ -450,7 +450,7 @@
     align-items: center;
     padding: var(--spacing-xs) 0;
     font-size: var(--font-size-sm);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    border-bottom: 1px solid var(--border-muted);
 }
 
 .receipt-row:last-child {
@@ -488,15 +488,15 @@
 }
 
 .receipt-status-badge--success {
-    background: rgba(67, 217, 173, 0.15);
-    color: #43d9ad;
-    border: 1px solid rgba(67, 217, 173, 0.3);
+    background: var(--success-tint-150);
+    color: var(--color-success-alt);
+    border: 1px solid var(--success-tint-300);
 }
 
 .receipt-status-badge--error {
-    background: rgba(245, 87, 108, 0.15);
+    background: var(--error-tint-150);
     color: var(--error-color);
-    border: 1px solid rgba(245, 87, 108, 0.3);
+    border: 1px solid var(--error-tint-300);
 }
 
 /* Schedule preview */
@@ -523,7 +523,7 @@
 }
 
 .receipt-table th {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--bg-glass);
     color: var(--text-muted);
     font-weight: 600;
     text-align: right;
@@ -540,7 +540,7 @@
     color: var(--text-primary);
     text-align: right;
     padding: var(--spacing-sm) var(--spacing-md);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    border-bottom: 1px solid var(--border-muted);
 }
 
 .receipt-table td:first-child {
@@ -549,7 +549,7 @@
 }
 
 .receipt-table tbody tr:hover {
-    background: rgba(255, 255, 255, 0.02);
+    background: var(--panel-subtle-bg);
 }
 
 .receipt-table-ellipsis td {
@@ -561,6 +561,6 @@
 }
 
 .receipt-table-row--last td {
-    background: rgba(102, 126, 234, 0.06);
+    background: var(--primary-tint-50);
     font-weight: 600;
 }
