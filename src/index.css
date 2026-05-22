@@ -29,22 +29,25 @@ body {
   overflow-x: hidden;
 }
 
-/* Animated Background */
+/* Animated gradient background */
 body::before {
   content: '';
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: -10%;
+  left: -10%;
+  width: 120%;
+  height: 120%;
   background: var(--app-background-effects);
   z-index: -1;
-  animation: backgroundShift 20s ease-in-out infinite;
+  animation: backgroundDrift 24s ease-in-out infinite;
+  will-change: transform, opacity;
 }
 
-@keyframes backgroundShift {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.8; }
+@keyframes backgroundDrift {
+  0%   { opacity: 1;    transform: translate(0,    0)    scale(1); }
+  33%  { opacity: 0.88; transform: translate(2%,  -2%)  scale(1.03); }
+  66%  { opacity: 0.92; transform: translate(-2%,  2%)  scale(1.01); }
+  100% { opacity: 1;    transform: translate(0,    0)    scale(1); }
 }
 
 #root {

@@ -281,12 +281,14 @@
   --text-muted: var(--neutral-500);
   --text-inverse: var(--neutral-0);
 
-  --bg-primary: var(--neutral-50);
-  --bg-secondary: var(--neutral-0);
-  --bg-tertiary: var(--neutral-100);
-  --bg-card: rgba(255, 255, 255, 0.82);
-  --bg-glass: rgba(15, 15, 30, 0.04);
-  --bg-glass-hover: rgba(15, 15, 30, 0.07);
+  /* Page base — noticeably cool blue-gray so white cards lift off it */
+  --bg-primary: #e6ebf6;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #edf0f9;
+  /* Cards pop as clean white panels against the tinted background */
+  --bg-card: rgba(255, 255, 255, 0.97);
+  --bg-glass: rgba(255, 255, 255, 0.7);
+  --bg-glass-hover: rgba(255, 255, 255, 0.82);
   --bg-subtle: rgba(15, 15, 30, 0.03);
   --bg-subtle-hover: rgba(15, 15, 30, 0.05);
   --bg-muted: rgba(15, 15, 30, 0.06);
@@ -313,6 +315,12 @@
   --shadow-primary-md: 0 4px 16px rgba(69, 84, 173, 0.4);
   --shadow-glow: 0 0 16px rgba(102, 126, 234, 0.2);
 
+  /* Card elevation — white panel against tinted background */
+  --card-bg: rgba(255, 255, 255, 0.97);
+  --card-shadow: 0 1px 4px rgba(15, 15, 30, 0.06), 0 8px 28px rgba(15, 15, 30, 0.09);
+  --card-shadow-hover: 0 4px 8px rgba(15, 15, 30, 0.08), 0 16px 40px rgba(15, 15, 30, 0.12);
+  --card-border: rgba(255, 255, 255, 0.8);
+
   /* Flat, professional buttons — no gradient */
   --button-primary-bg: var(--primary-700);
   --button-primary-text: #ffffff;
@@ -323,7 +331,8 @@
   --button-secondary-text: var(--neutral-700);
 
   --app-background-effects:
-    radial-gradient(circle at 20% 50%, var(--primary-tint-100) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, var(--secondary-tint-100) 0%, transparent 50%),
-    radial-gradient(circle at 40% 20%, var(--accent-tint-80) 0%, transparent 50%);
+    radial-gradient(ellipse 70% 60% at  0%  15%, rgba(102, 126, 234, 0.28) 0%, transparent 100%),
+    radial-gradient(ellipse 60% 55% at 100% 85%, rgba(118,  75, 162, 0.20) 0%, transparent 100%),
+    radial-gradient(ellipse 50% 45% at  80%   0%, rgba( 79, 172, 254, 0.18) 0%, transparent 100%),
+    radial-gradient(ellipse 45% 40% at  20% 100%, rgba( 67, 217, 173, 0.12) 0%, transparent 100%);
 }
