@@ -5,7 +5,10 @@
       "PowerShell(ls \"c:\\\\Users\\\\Rohit.Lingarker\\\\MyFiles\\\\agentic-ai\\\\bfsi-ui\" | Where-Object { $_.PSIsContainer -eq $false })",
       "PowerShell(Get-ChildItem \"c:\\\\Users\\\\Rohit.Lingarker\\\\MyFiles\\\\agentic-ai\\\\bfsi-ui\" | Where-Object { !$_.PSIsContainer })",
       "Bash(\\\\.scss\")",
-      "PowerShell(Get-ChildItem \"c:\\\\Users\\\\Rohit.Lingarker\\\\MyFiles\\\\agentic-ai\\\\bfsi-ui\\\\src\" | Where-Object { !$_.PSIsContainer })"
+      "PowerShell(Get-ChildItem \"c:\\\\Users\\\\Rohit.Lingarker\\\\MyFiles\\\\agentic-ai\\\\bfsi-ui\\\\src\" | Where-Object { !$_.PSIsContainer })",
+      "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\Rohit.Lingarker\\\\MyFiles\\\\agentic-ai\\\\bfsi-ui\" -Force)",
+      "Bash(Select-Object Name, Mode)",
+      "Bash(npm run *)"
     ]
   }
 }
