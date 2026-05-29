@@ -2,9 +2,9 @@ import React from 'react';
 import Button from '../FormElements/Button';
 
 const formatCurrency = (value) =>
-  Number(value || 0).toLocaleString('en-US', {
+  Number(value || 0).toLocaleString('en-IN', {
     style: 'currency',
-    currency: 'USD',
+    currency: 'INR',
     maximumFractionDigits: 0,
   });
 
@@ -22,13 +22,29 @@ const OfferCard = ({ title, terms, isHighlighted = false, onAccept, ctaLabel }) 
 
   return (
     <div className={`offer-card ${isHighlighted ? 'offer-card--highlighted' : ''}`}>
-      <h3 className="offer-card-title">{title}</h3>
+      <h3 className="offer-card-title">
+        {title}
+        {terms.is_recommended && (
+          <span className="offer-recommended-badge"> ★ Recommended</span>
+        )}
+      </h3>
       <dl className="offer-terms">
         <OfferRow label="Loan Amount" value={formatCurrency(terms.amount)} />
         <OfferRow label="Term" value={`${terms.term_months} months`} />
-        <OfferRow label="Interest Rate" value={`${terms.interest_rate}% APR`} />
-        {/* <OfferRow label="Monthly Payment" value={`${formatCurrency(terms.monthly_payment)}/mo`} large /> */}
+        <OfferRow label="Interest Rate" value={`${terms.interest_rate}% p.a.`} />
+        {terms.monthly_payment != null && (
+          <OfferRow label="Monthly EMI" value={`${formatCurrency(terms.monthly_payment)}/mo`} large />
+        )}
+        {terms.disbursement_amount != null && (
+          <OfferRow label="Net Disbursement" value={formatCurrency(terms.disbursement_amount)} />
+        )}
+        {terms.total_repayment != null && (
+          <OfferRow label="Total Repayment" value={formatCurrency(terms.total_repayment)} />
+        )}
       </dl>
+      {terms.justification && (
+        <p className="offer-justification">{terms.justification}</p>
+      )}
       {onAccept ? (
         <Button type="button" variant="primary" onClick={onAccept}>
           {ctaLabel}

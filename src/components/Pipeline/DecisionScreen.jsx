@@ -75,10 +75,10 @@ const DecisionScreen = ({ decision, onConfirm, onDecline, onReset }) => {
                   key={opt.option_id || idx}
                   title={opt.description || `Option ${idx + 1}`}
                   terms={opt}
-                  isHighlighted={idx === 0}
+                  isHighlighted={opt.is_recommended ?? idx === 0}
                   onAccept={() => onConfirm(opt)}
                   ctaLabel={
-                    decision.isHITLBankDecision
+                    decision.isNewCounterOfferFlow || decision.isHITLBankDecision
                       ? "Accept & Sign Agreement"
                       : "Select This Offer"
                   }

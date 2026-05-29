@@ -363,6 +363,27 @@ const LoanIntake = () => {
 
   const handleDecisionConfirm = useCallback(
     async (selectedTerms) => {
+      if (pipelineDecision?.isNewCounterOfferFlow) {
+        // New counter-offer flow: select specific option → signature
+        setDisbursementLoading(true);
+        try {
+          await orchestratorClient.post(
+            `/pipeline/${applicationId}/select-counter-offer`,
+            { option_id: selectedTerms.option_id },
+          );
+          setAcceptedTerms(selectedTerms);
+          setPipelinePhase("awaiting_signature");
+        } catch (error) {
+          console.error("Counter offer selection failed:", error);
+          toast.error(
+            error.response?.data?.detail || "Failed to select offer. Please retry.",
+          );
+        } finally {
+          setDisbursementLoading(false);
+        }
+        return;
+      }
+
       if (pipelineDecision?.isHITLBankDecision) {
         // HITL flow: accept bank offer → show signature screen
         setDisbursementLoading(true);
@@ -421,6 +442,16 @@ const LoanIntake = () => {
   );
 
   const handleDecisionDecline = useCallback(async () => {
+    if (pipelineDecision?.isNewCounterOfferFlow) {
+      try {
+        await orchestratorClient.post(`/pipeline/${applicationId}/decline-all-offers`);
+      } catch {
+        // best-effort; session will expire on its own
+      }
+      toast.info("All counter offers declined.");
+      resetApplication();
+      return;
+    }
     if (pipelineDecision?.isHITLBankDecision) {
       try {
         await orchestratorClient.post(`/pipeline/${applicationId}/decline`);
@@ -512,12 +543,12 @@ const LoanIntake = () => {
               <div className="decision-hero">
                 <span className="decision-badge">Processing</span>
                 <h2 className="card-title">
-                  {pipelineDecision?.isHITLBankDecision
+                  {pipelineDecision?.isNewCounterOfferFlow || pipelineDecision?.isHITLBankDecision
                     ? "Accepting Offer"
                     : "Disbursing Funds"}
                 </h2>
                 <p className="card-subtitle">
-                  {pipelineDecision?.isHITLBankDecision
+                  {pipelineDecision?.isNewCounterOfferFlow || pipelineDecision?.isHITLBankDecision
                     ? "Confirming your acceptance with the bank…"
                     : "Executing fund transfer and generating your receipt…"}
                 </p>

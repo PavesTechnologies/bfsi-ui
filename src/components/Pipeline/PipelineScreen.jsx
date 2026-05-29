@@ -42,6 +42,42 @@ const getElapsed = (data) => {
 const normalizeTerminalDecision = (data) => {
   const details = data?.details || {};
 
+  // New counter-offer flow: bank published options after in-house review
+  if (data.event === "bank_counter_offers_published") {
+    const rawOpts = details.current_options ?? details.counter_offer_options ?? data.current_options ?? [];
+    const counterOfferOptions = rawOpts.map((opt) => ({
+      option_id: opt.option_id,
+      description: opt.label,
+      amount: opt.proposed_amount,
+      term_months: opt.proposed_tenure_months,
+      interest_rate: opt.proposed_interest_rate,
+      monthly_payment: opt.monthly_payment_emi,
+      disbursement_amount: opt.disbursement_amount,
+      total_repayment: opt.total_repayment,
+      affordability_headroom_pct: opt.affordability_headroom_pct,
+      is_recommended: opt.is_recommended,
+      feasible: opt.feasible,
+      justification: opt.justification,
+    }));
+    return {
+      decision: "COUNTER_OFFER",
+      isNewCounterOfferFlow: true,
+      reason:
+        "The bank has reviewed your application and prepared alternative offers. Please select an option.",
+      counterOfferOptions: counterOfferOptions.length > 0 ? counterOfferOptions : null,
+      application_id: data.application_id,
+    };
+  }
+
+  // Counter-offer all declined by applicant (terminal)
+  if (data.event === "counter_offer_all_declined") {
+    return {
+      decision: "DECLINED",
+      reason: "All counter offers have been declined.",
+      application_id: data.application_id,
+    };
+  }
+
   // HITL: bank has reviewed and sends decision to applicant
   if (data.event === "awaiting_applicant_response") {
     const fd = details.final_decision;
@@ -178,6 +214,9 @@ const PipelineScreen = ({ applicationId, onComplete }) => {
         if (data.event === "bank_decisioning_started") {
           setHitlStatus("Bank decisioning in progress…");
         }
+        if (data.event === "counter_offer_review_started") {
+          setHitlStatus("Counter offer under bank review…");
+        }
 
         const stageIndex = PIPELINE_STAGES.findIndex(
           (stage) => stage.backendStage === data.stage,
@@ -226,8 +265,16 @@ const PipelineScreen = ({ applicationId, onComplete }) => {
             normalizedDecision.decision,
           );
         const isApplicantResponse = data.event === "awaiting_applicant_response";
+        const isBankOffersPublished = data.event === "bank_counter_offers_published";
+        const isCounterOfferAllDeclined = data.event === "counter_offer_all_declined";
 
-        if (!data.is_terminal && !decisioningTerminal && !isApplicantResponse) {
+        if (
+          !data.is_terminal &&
+          !decisioningTerminal &&
+          !isApplicantResponse &&
+          !isBankOffersPublished &&
+          !isCounterOfferAllDeclined
+        ) {
           return;
         }
 
