@@ -42,9 +42,6 @@ const OfferCard = ({ title, terms, isHighlighted = false, onAccept, ctaLabel }) 
           <OfferRow label="Total Repayment" value={formatCurrency(terms.total_repayment)} />
         )}
       </dl>
-      {terms.justification && (
-        <p className="offer-justification">{terms.justification}</p>
-      )}
       {onAccept ? (
         <Button type="button" variant="primary" onClick={onAccept}>
           {ctaLabel}

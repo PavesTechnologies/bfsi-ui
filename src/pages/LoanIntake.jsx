@@ -219,7 +219,98 @@ const LoanIntake = () => {
     }));
   };
 
+  const validateStep = (step) => {
+    const errors = [];
+
+    if (step === 0) {
+      const loan = formData.loan;
+      if (!loan.loan_type) errors.push('Loan Type is required');
+      if (!loan.credit_type) errors.push('Credit Type is required');
+      if (!loan.loan_purpose?.trim()) errors.push('Loan Purpose is required');
+      if (!loan.requested_amount || Number(loan.requested_amount) <= 0)
+        errors.push('Requested Amount must be greater than 0');
+      if (!loan.requested_term_months || Number(loan.requested_term_months) <= 0)
+        errors.push('Requested Term (months) must be greater than 0');
+      const pd = Number(loan.preferred_payment_day);
+      if (!loan.preferred_payment_day || pd < 1 || pd > 30)
+        errors.push('Preferred Payment Day must be between 1 and 30');
+      if (!loan.origination_channel) errors.push('Origination Channel is required');
+    }
+
+    if (step === 1) {
+      const a = formData.applicant;
+      if (!a.first_name?.trim()) errors.push('First Name is required');
+      if (!a.last_name?.trim()) errors.push('Last Name is required');
+      if (!a.date_of_birth) errors.push('Date of Birth is required');
+      if (!a.gender) errors.push('Gender is required');
+      if (!a.pan_number) errors.push('PAN Number is required');
+      else if (!/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(a.pan_number))
+        errors.push('PAN Number format must be ABCDE1234F');
+      if (!a.aadhaar_no) errors.push('Aadhaar Number is required');
+      else if (a.aadhaar_no.replace(/\D/g, '').length !== 12)
+        errors.push('Aadhaar Number must be exactly 12 digits');
+      if (!a.email?.trim()) errors.push('Email Address is required');
+      else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(a.email))
+        errors.push('Please enter a valid email address');
+    }
+
+    if (step === 2) {
+      const addresses = formData.applicant.addresses || [];
+      if (addresses.length === 0) {
+        errors.push('At least one address is required');
+      } else {
+        addresses.forEach((addr, i) => {
+          const n = i + 1;
+          if (!addr.address_line1?.trim()) errors.push(`Address ${n}: Address Line 1 is required`);
+          if (!addr.city?.trim()) errors.push(`Address ${n}: City is required`);
+          if (!addr.state) errors.push(`Address ${n}: State is required`);
+          if (!addr.zip_code || String(addr.zip_code).replace(/\D/g, '').length !== 6)
+            errors.push(`Address ${n}: Valid 6-digit PIN Code is required`);
+          if (!addr.housing_status) errors.push(`Address ${n}: Housing Status is required`);
+          if (addr.years_at_address === '' || addr.years_at_address === undefined)
+            errors.push(`Address ${n}: Years at Address is required`);
+          if (addr.months_at_address === '' || addr.months_at_address === undefined)
+            errors.push(`Address ${n}: Months at Address is required`);
+        });
+      }
+    }
+
+    if (step === 4) {
+      (formData.applicant.incomes || []).forEach((income, i) => {
+        const n = i + 1;
+        if (!income.income_type) errors.push(`Income ${n}: Income Type is required`);
+        if (!income.monthly_amount || Number(income.monthly_amount) <= 0)
+          errors.push(`Income ${n}: Monthly Amount must be greater than 0`);
+      });
+    }
+
+    if (step === 5) {
+      (formData.applicant.assets || []).forEach((a, i) => {
+        const n = i + 1;
+        if (!a.asset_type) errors.push(`Asset ${n}: Asset Type is required`);
+        if (!a.value || Number(a.value) <= 0) errors.push(`Asset ${n}: Value must be greater than 0`);
+      });
+      (formData.applicant.liabilities || []).forEach((l, i) => {
+        const n = i + 1;
+        if (!l.liability_type) errors.push(`Liability ${n}: Liability Type is required`);
+        if (!l.outstanding_balance || Number(l.outstanding_balance) <= 0)
+          errors.push(`Liability ${n}: Outstanding Balance must be greater than 0`);
+        if (!l.monthly_payment || Number(l.monthly_payment) <= 0)
+          errors.push(`Liability ${n}: Monthly Payment must be greater than 0`);
+        if (!l.months_remaining || Number(l.months_remaining) <= 0)
+          errors.push(`Liability ${n}: Months Remaining must be greater than 0`);
+      });
+    }
+
+    return errors;
+  };
+
   const handleNext = () => {
+    const errors = validateStep(currentStep);
+    if (errors.length > 0) {
+      errors.forEach((msg) => toast.error(msg));
+      return;
+    }
     if (currentStep < steps.length - 1) {
       setCurrentStep((step) => step + 1);
       window.scrollTo({ top: 0, behavior: "smooth" });

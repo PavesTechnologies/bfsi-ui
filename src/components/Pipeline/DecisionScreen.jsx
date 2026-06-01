@@ -69,7 +69,7 @@ const DecisionScreen = ({ decision, onConfirm, onDecline, onReset }) => {
           )}
 
           {options && options.length > 0 ? (
-            <div className="offer-cards-grid" style={{ gridTemplateColumns: `repeat(${options.length}, 1fr)` }}>
+            <div className={`offer-cards-grid${options.length === 1 ? ' offer-cards-grid--single' : ''}`}>
               {options.map((opt, idx) => (
                 <OfferCard
                   key={opt.option_id || idx}

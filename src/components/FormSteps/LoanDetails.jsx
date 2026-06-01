@@ -113,12 +113,19 @@ const LoanDetails = ({ formData, onChange }) => {
                 <Input
                     label="Preferred Payment Day"
                     name="preferred_payment_day"
-                    type="number"
+                    type="text"
                     value={formData.preferred_payment_day || ''}
-                    onChange={onChange}
-                    placeholder="1-31"
-                    min="1"
-                    max="31"
+                    onChange={(e) => {
+                        const raw = e.target.value.replace(/[^0-9]/g, '');
+                        if (raw === '') {
+                            onChange({ target: { name: 'preferred_payment_day', value: '' } });
+                            return;
+                        }
+                        const num = parseInt(raw, 10);
+                        if (num < 1 || num > 30) return; // hard block — don't update state
+                        onChange({ target: { name: 'preferred_payment_day', value: num } });
+                    }}
+                    placeholder="1-30"
                     required
                 />
 

@@ -57,7 +57,6 @@ const normalizeTerminalDecision = (data) => {
       affordability_headroom_pct: opt.affordability_headroom_pct,
       is_recommended: opt.is_recommended,
       feasible: opt.feasible,
-      justification: opt.justification,
     }));
     return {
       decision: "COUNTER_OFFER",
