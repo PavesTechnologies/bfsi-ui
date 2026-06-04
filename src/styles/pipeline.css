@@ -16,7 +16,7 @@
   inset: -30% auto auto -10%;
   width: 320px;
   height: 320px;
-  background: radial-gradient(circle, rgba(79, 172, 254, 0.18) 0%, rgba(79, 172, 254, 0) 70%);
+  background: radial-gradient(circle, var(--accent-tint-180) 0%, var(--accent-transparent) 70%);
   pointer-events: none;
 }
 
@@ -38,15 +38,15 @@
 
 .pipeline-application-id {
   color: var(--text-secondary);
-  font-family: 'DM Mono', monospace;
+  font-family: var(--font-family-mono);
 }
 
 .pipeline-status-chip,
 .decision-badge {
   padding: 0.45rem 0.8rem;
-  border-radius: 999px;
-  background: rgba(79, 172, 254, 0.12);
-  border: 1px solid rgba(79, 172, 254, 0.35);
+  border-radius: var(--radius-full);
+  background: var(--badge-info-bg);
+  border: 1px solid var(--badge-info-border);
   color: var(--text-secondary);
   font-size: var(--font-size-xs);
   letter-spacing: 0.08em;
@@ -54,21 +54,21 @@
 }
 
 .decision-badge--success {
-  background: rgba(67, 233, 123, 0.12);
-  border-color: rgba(67, 233, 123, 0.32);
+  background: var(--badge-success-bg);
+  border-color: var(--badge-success-border);
   color: var(--success-color);
 }
 
 .decision-badge--error {
-  background: rgba(245, 87, 108, 0.12);
-  border-color: rgba(245, 87, 108, 0.32);
+  background: var(--badge-error-bg);
+  border-color: var(--badge-error-border);
   color: var(--error-color);
 }
 
 .pipeline-progress-bar {
   height: 4px;
   background: var(--bg-tertiary);
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   margin-bottom: 28px;
   overflow: hidden;
 }
@@ -92,7 +92,7 @@
   padding: 16px 20px;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-color);
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--panel-subtle-bg);
   transition: all 0.4s ease;
   opacity: 0.4;
   animation: stageReveal 0.5s ease forwards;
@@ -101,20 +101,20 @@
 .stage-block--active {
   opacity: 1;
   border-color: var(--accent-color);
-  box-shadow: 0 0 16px rgba(79, 172, 254, 0.25);
+  box-shadow: var(--shadow-accent-sm);
   animation: stageReveal 0.5s ease forwards, stagePulse 2s ease-in-out infinite;
 }
 
 .stage-block--complete {
   opacity: 1;
-  border-color: rgba(67, 233, 123, 0.5);
-  background: rgba(67, 233, 123, 0.06);
+  border-color: var(--success-tint-500);
+  background: var(--success-tint-60);
 }
 
 .stage-block--error {
   opacity: 1;
-  border-color: rgba(245, 87, 108, 0.6);
-  background: rgba(245, 87, 108, 0.06);
+  border-color: var(--error-tint-600);
+  background: var(--error-tint-60);
 }
 
 .stage-icon {
@@ -124,12 +124,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--bg-muted);
+  border: 1px solid var(--border-soft);
   color: var(--text-primary);
   font-size: 0.85rem;
   letter-spacing: 0.08em;
-  font-family: 'DM Mono', monospace;
+  font-family: var(--font-family-mono);
   flex-shrink: 0;
 }
 
@@ -142,7 +142,7 @@
 .stage-label {
   color: var(--text-primary);
   font-weight: 600;
-  font-family: 'DM Mono', monospace;
+  font-family: var(--font-family-mono);
 }
 
 .stage-description {
@@ -173,7 +173,7 @@
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  border: 2px solid rgba(79, 172, 254, 0.2);
+  border: 2px solid var(--accent-tint-200);
   border-top-color: var(--accent-color);
   animation: spin 0.8s linear infinite;
 }
@@ -244,7 +244,7 @@
 
 .offer-card--highlighted {
   border-color: var(--accent-color);
-  box-shadow: 0 0 24px rgba(79, 172, 254, 0.2);
+  box-shadow: var(--shadow-accent-md);
 }
 
 .offer-card-title {
@@ -305,7 +305,7 @@
 }
 
 .decision-summary {
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--panel-subtle-bg-hover);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   padding: var(--spacing-lg);
@@ -315,10 +315,10 @@
 @keyframes stagePulse {
   0%,
   100% {
-    box-shadow: 0 0 12px rgba(79, 172, 254, 0.2);
+    box-shadow: var(--shadow-accent-pulse-low);
   }
   50% {
-    box-shadow: 0 0 28px rgba(79, 172, 254, 0.5);
+    box-shadow: var(--shadow-accent-pulse-high);
   }
 }
 

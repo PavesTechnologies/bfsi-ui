@@ -1,0 +1,338 @@
+/* ==========================================
+   LIGHT THEME TOKENS
+   Same token surface as theme.css, with light mode applied by default.
+   Switch back to dark at runtime by setting data-theme="dark" on <html> or <body>.
+   ========================================== */
+
+:root,
+[data-theme='dark'] {
+  /* Brand palette */
+  --primary-100: #eef1ff;
+  --primary-200: #cfd7ff;
+  --primary-300: #aebaff;
+  --primary-400: #8b9df8;
+  --primary-500: #667eea;
+  --primary-600: #5568d3;
+  --primary-700: #4554ad;
+  --primary-800: #343f86;
+  --primary-900: #252b5f;
+
+  --secondary-100: #f4edfb;
+  --secondary-200: #dfc9f0;
+  --secondary-300: #c69fe0;
+  --secondary-400: #a874c8;
+  --secondary-500: #764ba2;
+  --secondary-600: #633d89;
+  --secondary-700: #4f306f;
+  --secondary-800: #3a2454;
+  --secondary-900: #261838;
+
+  --accent-100: #e9f6ff;
+  --accent-200: #c4e7ff;
+  --accent-300: #95d4ff;
+  --accent-400: #6abdff;
+  --accent-500: #4facfe;
+  --accent-600: #2b8ee4;
+  --accent-700: #1b6fb6;
+  --accent-800: #155489;
+  --accent-900: #103a5e;
+
+  --cyan-500: #00f2fe;
+  --pink-500: #f093fb;
+
+  /* State palette */
+  --success-100: #e8fbf0;
+  --success-200: #c5f5d8;
+  --success-300: #91ecb5;
+  --success-400: #62e596;
+  --success-500: #43e97b;
+  --success-600: #43d9ad;
+  --success-700: #2eb77f;
+  --success-800: #208660;
+  --success-900: #15583f;
+
+  --warning-100: #fff5e3;
+  --warning-300: #ffd591;
+  --warning-500: #ffa726;
+  --warning-700: #c97908;
+
+  --error-100: #ffe9ed;
+  --error-200: #ffc4cc;
+  --error-300: #ff9aa8;
+  --error-400: #ff6b6b;
+  --error-500: #f5576c;
+  --error-600: #d84055;
+  --error-700: #ad2f41;
+  --error-800: #7d2331;
+  --error-900: #531822;
+
+  /* Neutral palette */
+  --neutral-0: #ffffff;
+  --neutral-50: #f7f7fb;
+  --neutral-100: #ececf5;
+  --neutral-200: #d9d9e8;
+  --neutral-300: #b8b8d1;
+  --neutral-400: #9696b3;
+  --neutral-500: #7c7c99;
+  --neutral-600: #5f5f7a;
+  --neutral-700: #3d3d59;
+  --neutral-800: #252540;
+  --neutral-850: #1a1a2e;
+  --neutral-900: #0f0f1e;
+  --neutral-950: #080812;
+
+  /* Text */
+  --text-primary: var(--neutral-0);
+  --text-secondary: var(--neutral-300);
+  --text-muted: var(--neutral-500);
+  --text-inverse: var(--neutral-950);
+  --text-link: var(--primary-500);
+  --text-link-hover: var(--primary-400);
+
+  /* Backgrounds and surfaces */
+  --bg-primary: var(--neutral-900);
+  --bg-secondary: var(--neutral-850);
+  --bg-tertiary: var(--neutral-800);
+  --bg-card: rgba(37, 37, 64, 0.6);
+  --bg-glass: rgba(255, 255, 255, 0.05);
+  --bg-glass-hover: rgba(255, 255, 255, 0.08);
+  --bg-subtle: rgba(255, 255, 255, 0.02);
+  --bg-subtle-hover: rgba(255, 255, 255, 0.03);
+  --bg-muted: rgba(255, 255, 255, 0.06);
+  --bg-overlay: rgba(0, 0, 0, 0.6);
+
+  /* Borders */
+  --border-color: rgba(255, 255, 255, 0.1);
+  --border-muted: rgba(255, 255, 255, 0.04);
+  --border-soft: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.15);
+  --border-focus: rgba(102, 126, 234, 0.5);
+
+  /* Semantic colors */
+  --color-primary: var(--primary-500);
+  --color-primary-hover: var(--primary-600);
+  --color-primary-light: var(--primary-400);
+  --color-secondary: var(--secondary-500);
+  --color-accent: var(--accent-500);
+  --color-success: var(--success-500);
+  --color-success-alt: var(--success-600);
+  --color-warning: var(--warning-500);
+  --color-error: var(--error-500);
+
+  --primary-color: var(--color-primary);
+  --primary-dark: var(--color-primary-hover);
+  --primary-light: var(--color-primary-light);
+  --secondary-color: var(--color-secondary);
+  --accent-color: var(--color-accent);
+  --success-color: var(--color-success);
+  --warning-color: var(--color-warning);
+  --error-color: var(--color-error);
+
+  /* Tints */
+  --primary-tint-50: rgba(102, 126, 234, 0.05);
+  --primary-tint-100: rgba(102, 126, 234, 0.1);
+  --primary-tint-150: rgba(102, 126, 234, 0.15);
+  --primary-tint-200: rgba(102, 126, 234, 0.2);
+  --primary-tint-300: rgba(102, 126, 234, 0.3);
+  --primary-tint-400: rgba(102, 126, 234, 0.4);
+  --primary-tint-500: rgba(102, 126, 234, 0.5);
+  --primary-tint-600: rgba(102, 126, 234, 0.6);
+
+  --accent-tint-50: rgba(79, 172, 254, 0.05);
+  --accent-tint-80: rgba(79, 172, 254, 0.08);
+  --accent-tint-100: rgba(79, 172, 254, 0.1);
+  --accent-tint-120: rgba(79, 172, 254, 0.12);
+  --accent-tint-180: rgba(79, 172, 254, 0.18);
+  --accent-tint-200: rgba(79, 172, 254, 0.2);
+  --accent-tint-250: rgba(79, 172, 254, 0.25);
+  --accent-tint-350: rgba(79, 172, 254, 0.35);
+  --accent-tint-500: rgba(79, 172, 254, 0.5);
+  --accent-transparent: rgba(79, 172, 254, 0);
+  --secondary-tint-100: rgba(118, 75, 162, 0.1);
+  --secondary-tint-150: rgba(118, 75, 162, 0.15);
+
+  --success-tint-60: rgba(67, 233, 123, 0.06);
+  --success-tint-80: rgba(72, 199, 142, 0.08);
+  --success-tint-120: rgba(67, 233, 123, 0.12);
+  --success-tint-150: rgba(67, 217, 173, 0.15);
+  --success-tint-300: rgba(67, 217, 173, 0.3);
+  --success-tint-320: rgba(67, 233, 123, 0.32);
+  --success-tint-500: rgba(67, 233, 123, 0.5);
+
+  --error-tint-60: rgba(245, 87, 108, 0.06);
+  --error-tint-80: rgba(255, 107, 107, 0.08);
+  --error-tint-100: rgba(245, 87, 108, 0.1);
+  --error-tint-120: rgba(245, 87, 108, 0.12);
+  --error-tint-150: rgba(245, 87, 108, 0.15);
+  --error-tint-300: rgba(245, 87, 108, 0.3);
+  --error-tint-320: rgba(245, 87, 108, 0.32);
+  --error-tint-600: rgba(245, 87, 108, 0.6);
+
+  /* Gradients */
+  --primary-gradient: linear-gradient(135deg, var(--primary-500) 0%, var(--secondary-500) 100%);
+  --secondary-gradient: linear-gradient(135deg, var(--pink-500) 0%, var(--error-500) 100%);
+  --accent-gradient: linear-gradient(135deg, var(--accent-500) 0%, var(--cyan-500) 100%);
+  --success-gradient: linear-gradient(135deg, var(--success-500) 0%, #38f9d7 100%);
+  --divider-gradient: linear-gradient(90deg, transparent, var(--border-color), transparent);
+  --app-background-effects:
+    radial-gradient(circle at 20% 50%, var(--primary-tint-150) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, var(--secondary-tint-150) 0%, transparent 50%),
+    radial-gradient(circle at 40% 20%, var(--accent-tint-100) 0%, transparent 50%);
+
+  /* Typography */
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-family-mono: 'DM Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 2rem;
+
+  /* Spacing */
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 0.75rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+
+  /* Radius */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-full: 999px;
+
+  /* Effects */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.3);
+  --shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.4);
+  --shadow-glow: 0 0 20px var(--primary-tint-300);
+  --shadow-primary-sm: 0 4px 15px var(--primary-tint-400);
+  --shadow-primary-md: 0 6px 20px var(--primary-tint-600);
+  --shadow-primary-ring: 0 0 0 3px var(--primary-tint-100);
+  --shadow-error-ring: 0 0 0 3px var(--error-tint-100);
+  --shadow-accent-sm: 0 0 16px var(--accent-tint-250);
+  --shadow-accent-md: 0 0 24px var(--accent-tint-200);
+  --shadow-accent-pulse-low: 0 0 12px var(--accent-tint-200);
+  --shadow-accent-pulse-high: 0 0 28px var(--accent-tint-500);
+
+  --transition-fast: 150ms ease-in-out;
+  --transition-base: 250ms ease-in-out;
+  --transition-slow: 350ms ease-in-out;
+
+  /* Component defaults */
+  --card-bg: var(--bg-card);
+  --card-border: var(--border-color);
+  --card-border-hover: var(--border-strong);
+  --card-shadow: var(--shadow-md);
+  --card-shadow-hover: var(--shadow-lg);
+
+  --input-bg: var(--bg-glass);
+  --input-bg-focus: var(--bg-glass-hover);
+  --input-border: var(--border-color);
+  --input-border-focus: var(--color-primary);
+  --input-text: var(--text-primary);
+  --input-placeholder: var(--text-muted);
+  --input-error-border: var(--color-error);
+  --select-indicator-color: #b8b8d1;
+  --select-indicator-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23b8b8d1' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+
+  --button-overlay-bg: rgba(255, 255, 255, 0.1);
+  --button-primary-bg: var(--primary-gradient);
+  --button-primary-text: var(--text-primary);
+  --button-primary-shadow: var(--shadow-primary-sm);
+  --button-primary-shadow-hover: var(--shadow-primary-md);
+  --button-secondary-bg: var(--bg-tertiary);
+  --button-secondary-bg-hover: var(--bg-card);
+  --button-secondary-text: var(--text-primary);
+  --button-outline-text: var(--color-primary);
+  --button-outline-border: var(--color-primary);
+  --button-danger-text: var(--color-error);
+  --button-danger-border: var(--color-error);
+  --button-add-text: var(--color-accent);
+  --button-add-border: var(--color-accent);
+  --button-add-bg-hover: var(--accent-tint-100);
+
+  --badge-info-bg: var(--accent-tint-120);
+  --badge-info-border: var(--accent-tint-350);
+  --badge-success-bg: var(--success-tint-120);
+  --badge-success-border: var(--success-tint-320);
+  --badge-error-bg: var(--error-tint-120);
+  --badge-error-border: var(--error-tint-320);
+
+  --panel-subtle-bg: var(--bg-subtle);
+  --panel-subtle-bg-hover: var(--bg-subtle-hover);
+  --panel-info-bg: var(--accent-tint-50);
+  --panel-info-border: var(--accent-tint-200);
+  --panel-primary-bg: var(--primary-tint-50);
+  --panel-primary-border: var(--primary-tint-200);
+  --panel-error-bg: var(--error-tint-80);
+  --panel-error-border: var(--error-color);
+}
+
+:root,
+[data-theme='light'] {
+  --text-primary: var(--neutral-900);
+  --text-secondary: var(--neutral-700);
+  --text-muted: var(--neutral-500);
+  --text-inverse: var(--neutral-0);
+
+  /* Page base — noticeably cool blue-gray so white cards lift off it */
+  --bg-primary: #e6ebf6;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #edf0f9;
+  /* Cards pop as clean white panels against the tinted background */
+  --bg-card: rgba(255, 255, 255, 0.97);
+  --bg-glass: rgba(255, 255, 255, 0.7);
+  --bg-glass-hover: rgba(255, 255, 255, 0.82);
+  --bg-subtle: rgba(15, 15, 30, 0.03);
+  --bg-subtle-hover: rgba(15, 15, 30, 0.05);
+  --bg-muted: rgba(15, 15, 30, 0.06);
+
+  --border-color: rgba(15, 15, 30, 0.14);
+  --border-muted: rgba(15, 15, 30, 0.06);
+  --border-soft: rgba(15, 15, 30, 0.09);
+  --border-strong: rgba(15, 15, 30, 0.22);
+
+  /* Input elements need solid backgrounds in light mode */
+  --input-bg: rgba(255, 255, 255, 0.9);
+  --input-bg-focus: #ffffff;
+  --input-border: rgba(15, 15, 30, 0.2);
+
+  /* Darker select arrow for light backgrounds */
+  --select-indicator-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%235f6876' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+
+  /* Softer shadows for light surfaces */
+  --shadow-sm: 0 1px 4px rgba(15, 15, 30, 0.07);
+  --shadow-md: 0 4px 14px rgba(15, 15, 30, 0.09);
+  --shadow-lg: 0 8px 28px rgba(15, 15, 30, 0.11);
+  --shadow-xl: 0 20px 50px rgba(15, 15, 30, 0.14);
+  --shadow-primary-sm: 0 2px 8px rgba(69, 84, 173, 0.3);
+  --shadow-primary-md: 0 4px 16px rgba(69, 84, 173, 0.4);
+  --shadow-glow: 0 0 16px rgba(102, 126, 234, 0.2);
+
+  /* Card elevation — white panel against tinted background */
+  --card-bg: rgba(255, 255, 255, 0.97);
+  --card-shadow: 0 1px 4px rgba(15, 15, 30, 0.06), 0 8px 28px rgba(15, 15, 30, 0.09);
+  --card-shadow-hover: 0 4px 8px rgba(15, 15, 30, 0.08), 0 16px 40px rgba(15, 15, 30, 0.12);
+  --card-border: rgba(255, 255, 255, 0.8);
+
+  /* Flat, professional buttons — no gradient */
+  --button-primary-bg: var(--primary-700);
+  --button-primary-text: #ffffff;
+  --button-primary-shadow: 0 2px 6px rgba(69, 84, 173, 0.35);
+  --button-primary-shadow-hover: 0 4px 14px rgba(69, 84, 173, 0.45);
+  --button-secondary-bg: var(--neutral-0);
+  --button-secondary-bg-hover: var(--neutral-50);
+  --button-secondary-text: var(--neutral-700);
+
+  --app-background-effects:
+    radial-gradient(ellipse 70% 60% at  0%  15%, rgba(102, 126, 234, 0.28) 0%, transparent 100%),
+    radial-gradient(ellipse 60% 55% at 100% 85%, rgba(118,  75, 162, 0.20) 0%, transparent 100%),
+    radial-gradient(ellipse 50% 45% at  80%   0%, rgba( 79, 172, 254, 0.18) 0%, transparent 100%),
+    radial-gradient(ellipse 45% 40% at  20% 100%, rgba( 67, 217, 173, 0.12) 0%, transparent 100%);
+}

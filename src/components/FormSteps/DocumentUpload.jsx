@@ -179,7 +179,7 @@ const ProofSection = ({ proofType, selectedOption, onSelectOption, uploading, up
                                 padding: 'var(--spacing-xs) var(--spacing-md)',
                                 borderRadius: 'var(--radius-md)',
                                 border: `1px solid ${isSelected ? 'var(--primary-color)' : status === 'success' ? 'var(--success-color)' : 'var(--border-color)'}`,
-                                background: isSelected ? 'rgba(79,172,254,0.12)' : status === 'success' ? 'rgba(72,199,142,0.08)' : 'var(--bg-glass)',
+                                background: isSelected ? 'var(--accent-tint-120)' : status === 'success' ? 'var(--success-tint-80)' : 'var(--bg-glass)',
                                 color: isSelected ? 'var(--primary-color)' : status === 'success' ? 'var(--success-color)' : 'var(--text-secondary)',
                                 fontWeight: isSelected || status === 'success' ? 600 : 400,
                                 fontSize: 'var(--font-size-sm)',
@@ -287,7 +287,7 @@ const ZipModal = ({ applicationId, onApply, onClose }) => {
         <div
             onClick={onClose}
             style={{
-                position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)',
+                position: 'fixed', inset: 0, background: 'var(--bg-overlay)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 zIndex: 1000, padding: 'var(--spacing-xl)',
             }}
@@ -299,7 +299,7 @@ const ZipModal = ({ applicationId, onApply, onClose }) => {
                     background: 'var(--bg-secondary)', border: '1px solid var(--border-color)',
                     borderRadius: 'var(--radius-lg)', padding: 'var(--spacing-xl)',
                     width: '100%', maxWidth: '560px', maxHeight: '80vh',
-                    overflowY: 'auto', boxShadow: '0 20px 60px rgba(0,0,0,0.4)',
+                    overflowY: 'auto', boxShadow: 'var(--shadow-xl)',
                 }}
             >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--spacing-lg)' }}>
@@ -313,7 +313,7 @@ const ZipModal = ({ applicationId, onApply, onClose }) => {
                 </div>
 
                 {/* Hint */}
-                <div style={{ background: 'rgba(79,172,254,0.05)', border: '1px solid rgba(79,172,254,0.2)', borderRadius: 'var(--radius-md)', padding: 'var(--spacing-sm) var(--spacing-md)', marginBottom: 'var(--spacing-lg)', fontSize: 'var(--font-size-xs)', color: 'var(--text-muted)', lineHeight: 1.7 }}>
+                <div style={{ background: 'var(--panel-info-bg)', border: '1px solid var(--panel-info-border)', borderRadius: 'var(--radius-md)', padding: 'var(--spacing-sm) var(--spacing-md)', marginBottom: 'var(--spacing-lg)', fontSize: 'var(--font-size-xs)', color: 'var(--text-muted)', lineHeight: 1.7 }}>
                     Name each file with a keyword so it's recognised: <br />
                     <code style={{ color: 'var(--primary-color)' }}>pan</code>, <code style={{ color: 'var(--primary-color)' }}>aadhaar</code>, <code style={{ color: 'var(--primary-color)' }}>voter</code>, <code style={{ color: 'var(--primary-color)' }}>passport</code>, <code style={{ color: 'var(--primary-color)' }}>utility</code>, <code style={{ color: 'var(--primary-color)' }}>salary</code>, <code style={{ color: 'var(--primary-color)' }}>form16</code>, <code style={{ color: 'var(--primary-color)' }}>itr</code>, <code style={{ color: 'var(--primary-color)' }}>bank</code>
                 </div>
@@ -348,7 +348,7 @@ const ZipModal = ({ applicationId, onApply, onClose }) => {
 
                 {/* Error */}
                 {error && (
-                    <div style={{ padding: 'var(--spacing-sm) var(--spacing-md)', borderRadius: 'var(--radius-md)', background: 'rgba(255,107,107,0.08)', border: '1px solid var(--error-color)44', color: 'var(--error-color)', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--spacing-md)' }}>
+                    <div style={{ padding: 'var(--spacing-sm) var(--spacing-md)', borderRadius: 'var(--radius-md)', background: 'var(--panel-error-bg)', border: '1px solid var(--panel-error-border)', color: 'var(--error-color)', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--spacing-md)' }}>
                         ✗ {error}
                     </div>
                 )}
@@ -463,7 +463,7 @@ const DocumentUpload = ({ formData, onChange, applicationId, onContinue }) => {
                 </button>
             </div>
 
-            <div style={{ background: 'rgba(79,172,254,0.05)', border: '1px solid rgba(79,172,254,0.2)', borderRadius: 'var(--radius-md)', padding: 'var(--spacing-md)', marginBottom: 'var(--spacing-xl)' }}>
+            <div style={{ background: 'var(--panel-info-bg)', border: '1px solid var(--panel-info-border)', borderRadius: 'var(--radius-md)', padding: 'var(--spacing-md)', marginBottom: 'var(--spacing-xl)' }}>
                 <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--spacing-xs)' }}>
                     📋 <strong>Document Requirements:</strong>
                 </p>

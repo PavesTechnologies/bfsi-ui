@@ -1,74 +1,8 @@
-/* ==========================================
-   GLOBAL STYLES & DESIGN SYSTEM
-   Modern Fintech UI with Glassmorphism
-   ========================================== */
+@import './styles/light_theme.css';
 
-:root {
-  /* Color Palette - Vibrant & Modern */
-  --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-  --accent-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-  --success-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-  
-  --primary-color: #667eea;
-  --primary-dark: #5568d3;
-  --primary-light: #8b9df8;
-  
-  --secondary-color: #764ba2;
-  --accent-color: #4facfe;
-  --success-color: #43e97b;
-  --warning-color: #ffa726;
-  --error-color: #f5576c;
-  
-  /* Neutral Colors */
-  --bg-primary: #0f0f1e;
-  --bg-secondary: #1a1a2e;
-  --bg-tertiary: #252540;
-  --bg-card: rgba(37, 37, 64, 0.6);
-  --bg-glass: rgba(255, 255, 255, 0.05);
-  
-  --text-primary: #ffffff;
-  --text-secondary: #b8b8d1;
-  --text-muted: #7c7c99;
-  
-  --border-color: rgba(255, 255, 255, 0.1);
-  --border-focus: rgba(102, 126, 234, 0.5);
-  
-  /* Spacing */
-  --spacing-xs: 0.5rem;
-  --spacing-sm: 0.75rem;
-  --spacing-md: 1rem;
-  --spacing-lg: 1.5rem;
-  --spacing-xl: 2rem;
-  --spacing-2xl: 3rem;
-  
-  /* Typography */
-  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-size-xs: 0.75rem;
-  --font-size-sm: 0.875rem;
-  --font-size-base: 1rem;
-  --font-size-lg: 1.125rem;
-  --font-size-xl: 1.25rem;
-  --font-size-2xl: 1.5rem;
-  --font-size-3xl: 2rem;
-  
-  /* Shadows */
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.2);
-  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.3);
-  --shadow-glow: 0 0 20px rgba(102, 126, 234, 0.3);
-  
-  /* Border Radius */
-  --radius-sm: 0.375rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 0.75rem;
-  --radius-xl: 1rem;
-  
-  /* Transitions */
-  --transition-fast: 150ms ease-in-out;
-  --transition-base: 250ms ease-in-out;
-  --transition-slow: 350ms ease-in-out;
-}
+/* ==========================================
+   GLOBAL STYLES
+   ========================================== */
 
 /* ==========================================
    RESET & BASE STYLES
@@ -95,25 +29,25 @@ body {
   overflow-x: hidden;
 }
 
-/* Animated Background */
+/* Animated gradient background */
 body::before {
   content: '';
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: 
-    radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.15) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(118, 75, 162, 0.15) 0%, transparent 50%),
-    radial-gradient(circle at 40% 20%, rgba(79, 172, 254, 0.1) 0%, transparent 50%);
+  top: -10%;
+  left: -10%;
+  width: 120%;
+  height: 120%;
+  background: var(--app-background-effects);
   z-index: -1;
-  animation: backgroundShift 20s ease-in-out infinite;
+  animation: backgroundDrift 24s ease-in-out infinite;
+  will-change: transform, opacity;
 }
 
-@keyframes backgroundShift {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.8; }
+@keyframes backgroundDrift {
+  0%   { opacity: 1;    transform: translate(0,    0)    scale(1); }
+  33%  { opacity: 0.88; transform: translate(2%,  -2%)  scale(1.03); }
+  66%  { opacity: 0.92; transform: translate(-2%,  2%)  scale(1.01); }
+  100% { opacity: 1;    transform: translate(0,    0)    scale(1); }
 }
 
 #root {

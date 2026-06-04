@@ -710,7 +710,7 @@ const LoanIntake = () => {
 
       <div
         style={{
-          marginLeft: isCollapsed ? "60px" : "280px",
+          marginLeft: isCollapsed ? "60px" : "260px",
           flex: 1,
           padding: "var(--spacing-2xl)",
           maxWidth: "1200px",

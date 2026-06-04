@@ -4,7 +4,7 @@
 
 /* Button Component */
 .btn {
-    padding: var(--spacing-sm) var(--spacing-lg);
+    padding: 0.625rem var(--spacing-lg);
     font-size: var(--font-size-base);
     font-weight: 600;
     border-radius: var(--radius-md);
@@ -15,63 +15,53 @@
     gap: var(--spacing-xs);
     position: relative;
     overflow: hidden;
-}
-
-.btn::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.1);
-    transform: translate(-50%, -50%);
-    transition: width 0.6s, height 0.6s;
-}
-
-.btn:hover::before {
-    width: 300px;
-    height: 300px;
+    letter-spacing: 0.01em;
 }
 
 .btn-primary {
-    background: var(--primary-gradient);
-    color: var(--text-primary);
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    background: var(--button-primary-bg);
+    color: var(--button-primary-text);
+    box-shadow: var(--button-primary-shadow);
+    border: none;
 }
 
-.btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+.btn-primary:hover:not(:disabled) {
+    box-shadow: var(--button-primary-shadow-hover);
+    filter: brightness(1.08);
+    transform: translateY(-1px);
+}
+
+.btn-primary:active:not(:disabled) {
+    transform: translateY(0);
+    filter: brightness(0.96);
+    box-shadow: none;
 }
 
 .btn-secondary {
-    background: var(--bg-tertiary);
-    color: var(--text-primary);
-    border: 1px solid var(--border-color);
+    background: var(--button-secondary-bg);
+    color: var(--button-secondary-text);
+    border: 1.5px solid var(--border-color);
 }
 
-.btn-secondary:hover {
-    background: var(--bg-card);
-    border-color: var(--primary-color);
+.btn-secondary:hover:not(:disabled) {
+    background: var(--button-secondary-bg-hover);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
 }
 
 .btn-outline {
     background: transparent;
-    color: var(--primary-color);
-    border: 2px solid var(--primary-color);
+    color: var(--button-outline-text);
+    border: 1.5px solid var(--button-outline-border);
 }
 
-.btn-outline:hover {
-    background: var(--primary-color);
-    color: var(--text-primary);
+.btn-outline:hover:not(:disabled) {
+    background: var(--primary-tint-100);
 }
 
 .btn:disabled {
-    opacity: 0.5;
+    opacity: 0.45;
     cursor: not-allowed;
-    transform: none !important;
 }
 
 .btn-loading {
@@ -88,7 +78,7 @@
     left: 50%;
     margin-left: -8px;
     margin-top: -8px;
-    border: 2px solid var(--text-primary);
+    border: 2px solid currentColor;
     border-radius: 50%;
     border-top-color: transparent;
     animation: spin 0.6s linear infinite;
@@ -106,61 +96,128 @@
 }
 
 .form-label {
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
     font-size: var(--font-size-sm);
-    font-weight: 500;
+    font-weight: 600;
     color: var(--text-secondary);
     margin-bottom: var(--spacing-xs);
     transition: color var(--transition-fast);
+    letter-spacing: 0.01em;
+}
+
+.form-group:focus-within .form-label {
+    color: var(--color-primary);
+}
+
+.required-star {
+    color: var(--error-color);
+    font-size: 0.8em;
+    line-height: 1;
+    margin-left: 1px;
+}
+
+/* Icon wrapper */
+.form-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.form-input-icon {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    z-index: 1;
+    transition: color var(--transition-fast);
+}
+
+.form-input-icon-left {
+    left: 0.75rem;
+}
+
+.form-group:focus-within .form-input-icon {
+    color: var(--color-primary);
 }
 
 .form-input,
 .form-select {
     width: 100%;
     padding: var(--spacing-sm) var(--spacing-md);
-    background: var(--bg-glass);
-    border: 1px solid var(--border-color);
+    background: var(--input-bg);
+    border: 1.5px solid var(--input-border);
     border-radius: var(--radius-md);
-    color: var(--text-primary);
+    color: var(--input-text);
     font-size: var(--font-size-base);
     transition: all var(--transition-base);
     backdrop-filter: blur(10px);
 }
 
+.form-input.has-icon,
+.form-select.has-icon {
+    padding-left: 2.5rem;
+}
+
+.form-input:hover:not(:focus),
+.form-select:hover:not(:focus) {
+    border-color: var(--border-strong);
+}
+
 .form-input:focus,
 .form-select:focus {
     outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--input-border-focus);
+    box-shadow: var(--shadow-primary-ring);
+    background: var(--input-bg-focus);
 }
 
 .form-input::placeholder {
-    color: var(--text-muted);
+    color: var(--input-placeholder);
+    font-weight: 400;
 }
 
 .form-input.error,
 .form-select.error {
-    border-color: var(--error-color);
+    border-color: var(--input-error-border);
 }
 
 .form-input.error:focus,
 .form-select.error:focus {
-    box-shadow: 0 0 0 3px rgba(245, 87, 108, 0.1);
+    box-shadow: var(--shadow-error-ring);
 }
 
 .form-error {
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
     font-size: var(--font-size-xs);
     color: var(--error-color);
-    margin-top: var(--spacing-xs);
+    margin-top: 0.35rem;
     animation: slideDown 0.2s ease-out;
+}
+
+.form-error::before {
+    content: '';
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 16 16' fill='%23f5576c'%3E%3Cpath d='M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z'/%3E%3Cpath d='M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-size: contain;
 }
 
 @keyframes slideDown {
     from {
         opacity: 0;
-        transform: translateY(-5px);
+        transform: translateY(-4px);
     }
 
     to {
@@ -173,7 +230,7 @@
 .form-select {
     cursor: pointer;
     appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23b8b8d1' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-image: var(--select-indicator-icon);
     background-repeat: no-repeat;
     background-position: right var(--spacing-md) center;
     padding-right: calc(var(--spacing-md) * 2.5);
@@ -187,22 +244,40 @@
 .form-select option {
     background: var(--bg-secondary);
     color: var(--text-primary);
+    padding: var(--spacing-xs) var(--spacing-sm);
+}
+
+/* Date input — tame the browser chrome */
+input[type="date"].form-input {
+    color-scheme: light;
+}
+
+input[type="date"].form-input::-webkit-calendar-picker-indicator {
+    opacity: 0.45;
+    cursor: pointer;
+    transition: opacity var(--transition-fast);
+    border-radius: var(--radius-sm);
+    padding: 2px;
+}
+
+input[type="date"].form-input::-webkit-calendar-picker-indicator:hover {
+    opacity: 0.85;
 }
 
 /* Card Component */
 .card {
-    background: var(--bg-card);
+    background: var(--card-bg);
     backdrop-filter: blur(20px);
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--card-border);
     border-radius: var(--radius-lg);
     padding: var(--spacing-xl);
-    box-shadow: var(--shadow-md);
+    box-shadow: var(--card-shadow);
     transition: all var(--transition-base);
 }
 
 .card:hover {
-    border-color: rgba(255, 255, 255, 0.15);
-    box-shadow: var(--shadow-lg);
+    border-color: var(--card-border-hover);
+    box-shadow: var(--card-shadow-hover);
 }
 
 .card-header {
@@ -256,43 +331,55 @@
 .stepper {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-sm);
+    gap: 2px;
 }
 
 .stepper-item {
     display: flex;
     align-items: center;
     gap: var(--spacing-md);
-    padding: var(--spacing-md);
+    padding: 0.625rem var(--spacing-md);
     border-radius: var(--radius-md);
-    transition: all var(--transition-base);
+    transition: background var(--transition-base), border-color var(--transition-base);
     cursor: pointer;
     position: relative;
+    border-left: 3px solid transparent;
 }
 
 .stepper-item:hover {
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--panel-subtle-bg-hover);
 }
 
 .stepper-item.active {
-    background: rgba(102, 126, 234, 0.1);
+    background: var(--primary-tint-100);
+    border-left-color: var(--color-primary);
 }
 
+/* Completed: distinct tint so they read as "done, not current" */
 .stepper-item.completed {
-    opacity: 0.7;
+    background: var(--success-tint-60);
+    border-left-color: var(--color-success-alt);
+}
+
+.stepper-item.completed:hover {
+    background: var(--success-tint-80);
+}
+
+.stepper-item.pending {
+    background: transparent;
 }
 
 .stepper-icon {
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: var(--font-size-sm);
-    font-weight: 600;
+    font-size: var(--font-size-xs);
+    font-weight: 700;
     flex-shrink: 0;
-    transition: all var(--transition-base);
+    transition: background var(--transition-base), box-shadow var(--transition-base);
 }
 
 .stepper-item.pending .stepper-icon {
@@ -302,25 +389,38 @@
 }
 
 .stepper-item.active .stepper-icon {
-    background: var(--primary-gradient);
-    color: var(--text-primary);
-    box-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
+    background: var(--color-primary);
+    color: #ffffff;
+    box-shadow: 0 2px 8px var(--primary-tint-400);
 }
 
 .stepper-item.completed .stepper-icon {
-    background: var(--success-gradient);
-    color: var(--text-primary);
+    background: var(--color-success-alt);
+    color: #ffffff;
+    box-shadow: none;
 }
 
 .stepper-content {
     flex: 1;
+    min-width: 0;
 }
 
 .stepper-title {
     font-size: var(--font-size-sm);
     font-weight: 600;
     color: var(--text-primary);
-    margin-bottom: 2px;
+    margin-bottom: 1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.stepper-item.completed .stepper-title {
+    color: var(--text-secondary);
+}
+
+.stepper-item.active .stepper-title {
+    color: var(--color-primary);
 }
 
 .stepper-description {
@@ -328,16 +428,146 @@
     color: var(--text-muted);
 }
 
+.stepper-item.completed .stepper-description {
+    color: var(--color-success-alt);
+}
+
+/* ==========================================
+   CUSTOM SELECT DROPDOWN
+   ========================================== */
+
+.custom-select-wrapper {
+    position: relative;
+}
+
+/* The trigger button is styled like .form-input but as flex */
+.custom-select-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-xs);
+    cursor: pointer;
+    text-align: left;
+    user-select: none;
+    /* override default button height from padding */
+    height: auto;
+}
+
+/* When no value is selected, show muted placeholder colour */
+.custom-select-trigger.is-placeholder .custom-select-value {
+    color: var(--input-placeholder);
+    font-weight: 400;
+}
+
+.custom-select-value {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: var(--font-size-base);
+}
+
+.custom-select-chevron {
+    flex-shrink: 0;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    transition: transform var(--transition-fast), color var(--transition-fast);
+    margin-left: 4px;
+}
+
+.custom-select-chevron.is-open {
+    transform: rotate(180deg);
+    color: var(--color-primary);
+}
+
+.custom-select-trigger.is-open {
+    border-color: var(--input-border-focus);
+    box-shadow: var(--shadow-primary-ring);
+    background: var(--input-bg-focus);
+}
+
+/* The dropdown list */
+.custom-select-dropdown {
+    position: absolute;
+    top: calc(100% + 5px);
+    left: 0;
+    right: 0;
+    background: var(--bg-secondary);
+    border: 1.5px solid var(--border-strong);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    z-index: 9999;
+    overflow-y: auto;
+    max-height: 220px;
+    animation: dropdownOpen 0.14s ease-out;
+}
+
+@keyframes dropdownOpen {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.custom-select-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.6rem var(--spacing-md);
+    cursor: pointer;
+    font-size: var(--font-size-base);
+    color: var(--text-primary);
+    transition: background var(--transition-fast), color var(--transition-fast);
+    border-bottom: 1px solid var(--border-muted);
+}
+
+.custom-select-option:last-child {
+    border-bottom: none;
+}
+
+.custom-select-option.is-placeholder {
+    color: var(--text-muted);
+    font-style: italic;
+    font-size: var(--font-size-sm);
+}
+
+.custom-select-option.is-focused,
+.custom-select-option:hover {
+    background: var(--primary-tint-50);
+}
+
+.custom-select-option.is-selected {
+    background: var(--primary-tint-100);
+    color: var(--color-primary);
+    font-weight: 500;
+}
+
+.custom-select-option.is-selected.is-focused,
+.custom-select-option.is-selected:hover {
+    background: var(--primary-tint-150);
+}
+
+.custom-select-option-label {
+    flex: 1;
+}
+
+.custom-select-option-check {
+    color: var(--color-primary);
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    margin-left: var(--spacing-xs);
+}
+
 /* Section Divider */
 .section-divider {
     height: 1px;
-    background: linear-gradient(90deg, transparent, var(--border-color), transparent);
+    background: var(--divider-gradient);
     margin: var(--spacing-xl) 0;
 }
 
 /* Dynamic List (for adding/removing items) */
 .dynamic-list-item {
-    background: rgba(255, 255, 255, 0.02);
+    background: var(--panel-subtle-bg);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
     padding: var(--spacing-lg);
@@ -362,25 +592,25 @@
 
 .btn-remove {
     background: transparent;
-    color: var(--error-color);
+    color: var(--button-danger-text);
     padding: var(--spacing-xs) var(--spacing-sm);
     font-size: var(--font-size-sm);
-    border: 1px solid var(--error-color);
+    border: 1px solid var(--button-danger-border);
     border-radius: var(--radius-sm);
     transition: all var(--transition-base);
 }
 
 .btn-remove:hover {
-    background: var(--error-color);
+    background: var(--color-error);
     color: var(--text-primary);
 }
 
 .btn-add {
     background: transparent;
-    color: var(--accent-color);
+    color: var(--button-add-text);
     padding: var(--spacing-sm) var(--spacing-md);
     font-size: var(--font-size-sm);
-    border: 1px dashed var(--accent-color);
+    border: 1px dashed var(--button-add-border);
     border-radius: var(--radius-md);
     transition: all var(--transition-base);
     width: 100%;
@@ -388,7 +618,7 @@
 }
 
 .btn-add:hover {
-    background: rgba(79, 172, 254, 0.1);
+    background: var(--button-add-bg-hover);
     border-style: solid;
 }
 
@@ -427,7 +657,7 @@
 }
 
 .receipt-card {
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--panel-subtle-bg-hover);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
     padding: var(--spacing-lg);
@@ -450,7 +680,7 @@
     align-items: center;
     padding: var(--spacing-xs) 0;
     font-size: var(--font-size-sm);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    border-bottom: 1px solid var(--border-muted);
 }
 
 .receipt-row:last-child {
@@ -488,15 +718,15 @@
 }
 
 .receipt-status-badge--success {
-    background: rgba(67, 217, 173, 0.15);
-    color: #43d9ad;
-    border: 1px solid rgba(67, 217, 173, 0.3);
+    background: var(--success-tint-150);
+    color: var(--color-success-alt);
+    border: 1px solid var(--success-tint-300);
 }
 
 .receipt-status-badge--error {
-    background: rgba(245, 87, 108, 0.15);
+    background: var(--error-tint-150);
     color: var(--error-color);
-    border: 1px solid rgba(245, 87, 108, 0.3);
+    border: 1px solid var(--error-tint-300);
 }
 
 /* Schedule preview */
@@ -523,7 +753,7 @@
 }
 
 .receipt-table th {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--bg-glass);
     color: var(--text-muted);
     font-weight: 600;
     text-align: right;
@@ -540,7 +770,7 @@
     color: var(--text-primary);
     text-align: right;
     padding: var(--spacing-sm) var(--spacing-md);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    border-bottom: 1px solid var(--border-muted);
 }
 
 .receipt-table td:first-child {
@@ -549,7 +779,7 @@
 }
 
 .receipt-table tbody tr:hover {
-    background: rgba(255, 255, 255, 0.02);
+    background: var(--panel-subtle-bg);
 }
 
 .receipt-table-ellipsis td {
@@ -561,6 +791,6 @@
 }
 
 .receipt-table-row--last td {
-    background: rgba(102, 126, 234, 0.06);
+    background: var(--primary-tint-50);
     font-weight: 600;
 }
