@@ -1,5 +1,11 @@
 import { isDemoMode } from "../config/env";
-import { getDemoApplicationScenario } from "../api/demoApi";
+import {
+  DEMO_PHASES,
+  DEMO_PHASE_DELAY_MS,
+  ensureDemoApplicationScenario,
+  setDemoApplicationPhase,
+} from "../api/demoApi";
+import { loadApplication } from "../utils/applicationStorage";
 
 const normalizePipelinePayload = (payload) => {
   if (!payload || typeof payload !== "object") {
@@ -15,6 +21,201 @@ const normalizePipelinePayload = (payload) => {
   };
 };
 
+// ── Demo pipeline timeline ──────────────────────────────────────────────────
+//
+// The same event sequence the real orchestrator pushes over SSE for the HITL
+// flow, on a timer instead of over the wire:
+//
+//   PIPELINE_ACCEPTED → KYC_TRIGGERED → KYC_PASSED → AWAITING_BANK_REVIEW
+//     → BANK_DECISIONING_STARTED → one of
+//         AWAITING_APPLICANT_RESPONSE      (approve)
+//         COUNTER_OFFER_REVIEW_STARTED → BANK_COUNTER_OFFERS_PUBLISHED
+//         APPLICATION_DECLINED             (terminal)
+//
+// Event names, stages, statuses, `is_terminal` and the `details` payloads all
+// match the real emissions, so PipelineScreen's stage machine and
+// normalizeTerminalDecision() take exactly the same branches in both modes.
+//
+// Every genuine processing phase — identity verification, the bank review
+// queue, bank decisioning, counter-offer review — is held for
+// DEMO_PHASE_DELAY_MS so the stage transitions and progress bar read the way
+// they do against the live stack.
+
+// Short gap between an event and the one that immediately follows it on the
+// real stack (e.g. KYC_PASSED then AWAITING_BANK_REVIEW).
+const HANDOFF_MS = 250;
+
+// Rebuilds the intake payload shape buildDemoScenario() expects from the
+// persisted form state, so a mid-pipeline reload can recover the scenario.
+const rawApplicationFromStorage = () => {
+  const saved = loadApplication();
+  if (!saved?.formData) return {};
+  const { loan = {}, applicant = {} } = saved.formData;
+  return { ...loan, applicants: [applicant] };
+};
+
+const buildDemoSequence = (applicationId, scenario) => {
+  const events = [];
+  let at = 0;
+
+  const emit = (delayBefore, payload, onEmit) => {
+    at += delayBefore;
+    events.push({ delay: at, payload: { application_id: applicationId, ...payload }, onEmit });
+  };
+
+  emit(0, {
+    event: "PIPELINE_ACCEPTED",
+    stage: "ORCHESTRATOR",
+    status: "started",
+    message: "Pipeline accepted for processing",
+    is_terminal: false,
+  });
+
+  emit(HANDOFF_MS, {
+    event: "KYC_TRIGGERED",
+    stage: "KYC",
+    status: "started",
+    message: "India KYC verification started",
+    is_terminal: false,
+  });
+
+  // Phase 1 — identity verification.
+  emit(DEMO_PHASE_DELAY_MS, {
+    event: "KYC_PASSED",
+    stage: "KYC",
+    status: "completed",
+    message: "India KYC verification passed",
+    details: {
+      confidence_score: 0.94,
+      ckyc_id: `CKYC${String(Math.abs(hashCode(applicationId)) % 100000000).padStart(8, "0")}`,
+    },
+    is_terminal: false,
+  });
+
+  emit(
+    HANDOFF_MS,
+    {
+      event: "AWAITING_BANK_REVIEW",
+      stage: "DECISIONING",
+      status: "pending",
+      message: "Application submitted for bank review",
+      is_terminal: false,
+    },
+    () => setDemoApplicationPhase(applicationId, DEMO_PHASES.AWAITING_BANK_REVIEW),
+  );
+
+  // Phase 2 — waiting in the bank's review queue.
+  emit(DEMO_PHASE_DELAY_MS, {
+    event: "BANK_DECISIONING_STARTED",
+    stage: "DECISIONING",
+    status: "started",
+    message: "Bank triggered credit decisioning",
+    is_terminal: false,
+  });
+
+  // Phase 3 — decisioning, then the bank's decision.
+  if (scenario.decision === "DECLINE") {
+    emit(DEMO_PHASE_DELAY_MS, {
+      event: "APPLICATION_DECLINED",
+      stage: "DECISIONING",
+      status: "completed",
+      message: "Bank declined the loan application",
+      details: { decision: "DECLINE", reason: scenario.declineReason },
+      is_terminal: true,
+    });
+    return events;
+  }
+
+  if (scenario.decision === "COUNTER_OFFER") {
+    emit(DEMO_PHASE_DELAY_MS, {
+      event: "COUNTER_OFFER_REVIEW_STARTED",
+      stage: "DECISIONING",
+      status: "pending",
+      message: "Counter offers generated — bank employee review in progress",
+      details: { decision: "COUNTER_OFFER" },
+      is_terminal: false,
+    });
+
+    // Phase 4 — the bank employee reviewing and publishing the offers.
+    emit(
+      DEMO_PHASE_DELAY_MS,
+      {
+        event: "BANK_COUNTER_OFFERS_PUBLISHED",
+        stage: "DECISIONING",
+        status: "pending",
+        message: "Bank has published counter offers — please select one to proceed",
+        details: { current_options: scenario.counterOffer.current_options },
+        is_terminal: false,
+      },
+      () =>
+        setDemoApplicationPhase(
+          applicationId,
+          DEMO_PHASES.AWAITING_COUNTER_OFFER_SELECTION,
+        ),
+    );
+    return events;
+  }
+
+  const approved = scenario.approved;
+  emit(
+    DEMO_PHASE_DELAY_MS,
+    {
+      event: "AWAITING_APPLICANT_RESPONSE",
+      stage: "DECISIONING",
+      status: "completed",
+      message: "Bank decision ready — awaiting applicant response",
+      details: {
+        final_decision: "APPROVE",
+        approved_amount: approved.approved_amount,
+        interest_rate: approved.interest_rate,
+        tenure_months: approved.approved_tenure_months,
+        monthly_emi: approved.monthly_emi,
+        counter_offer_options: null,
+      },
+      is_terminal: false,
+    },
+    () =>
+      setDemoApplicationPhase(applicationId, DEMO_PHASES.AWAITING_APPLICANT_RESPONSE),
+  );
+
+  return events;
+};
+
+// Stable per-application filler for the mock CKYC id.
+function hashCode(value) {
+  let hash = 0;
+  for (let i = 0; i < value.length; i += 1) {
+    hash = (hash << 5) - hash + value.charCodeAt(i);
+    hash |= 0;
+  }
+  return hash;
+}
+
+function subscribeToDemoPipeline(applicationId, onEvent, onError) {
+  const scenario = ensureDemoApplicationScenario(
+    applicationId,
+    rawApplicationFromStorage(),
+  );
+
+  if (!scenario?.decision) {
+    onError?.("Could not resume this application. Please start a new one.");
+    return () => {};
+  }
+
+  const timers = buildDemoSequence(applicationId, scenario).map(
+    ({ delay, payload, onEmit }) =>
+      window.setTimeout(() => {
+        onEmit?.();
+        const normalized = normalizePipelinePayload(payload);
+        if (normalized) {
+          onEvent?.({ event: normalized.event, data: normalized });
+        }
+      }, delay),
+  );
+
+  return () => timers.forEach(window.clearTimeout);
+}
+
 export function subscribeToPipeline(applicationId, onEvent, onError) {
   if (!applicationId) {
     onError?.("Missing application ID.");
@@ -22,153 +223,7 @@ export function subscribeToPipeline(applicationId, onEvent, onError) {
   }
 
   if (isDemoMode) {
-    const scenario = getDemoApplicationScenario(applicationId);
-    const decision = scenario?.decision || {
-      decision: "APPROVED",
-      requested: {
-        amount: 100000,
-        term_months: 36,
-        monthly_payment: 3205,
-        interest_rate: 8.9,
-      },
-    };
-
-    const mockSequence = [
-      {
-        delay: 2000,
-        data: {
-          application_id: applicationId,
-          event: "KYC_TRIGGERED",
-          stage: "KYC",
-          status: "started",
-          message: "KYC verification started",
-          is_terminal: false,
-        },
-      },
-      {
-        delay: 5000,
-        data: {
-          application_id: applicationId,
-          event: "KYC_PASSED",
-          stage: "KYC",
-          status: "completed",
-          message: "KYC verification completed",
-          details: { elapsed: 1.1 },
-          is_terminal: false,
-        },
-      },
-      {
-        delay: 8000,
-        data: {
-          application_id: applicationId,
-          event: "UNDERWRITING_STARTED",
-          stage: "DECISIONING",
-          status: "started",
-          message: "Underwriting started",
-          is_terminal: false,
-        },
-      },
-      {
-        delay: 12000,
-        data:
-          decision.decision === "COUNTER_OFFER"
-            ? {
-                application_id: applicationId,
-                event: "COUNTER_OFFER_PENDING",
-                stage: "DECISIONING",
-                status: "completed",
-                message: "Underwriting completed: counter offer generated",
-                is_terminal: true,
-                details: {
-                  decision: "COUNTER_OFFER",
-                  reason:
-                    "Your requested amount exceeds our lending capacity based on your income and debt-to-income ratio.",
-                  counter_offer_options: [
-                    {
-                      offer_id: "OPT_1",
-                      label: "Reduced Amount",
-                      principal_amount: decision.counter.amount,
-                      tenure_months: decision.counter.term_months,
-                      interest_rate: decision.counter.interest_rate,
-                      monthly_emi: decision.counter.monthly_payment,
-                      disbursement_amount: Math.round(
-                        decision.counter.amount * 0.99,
-                      ),
-                      total_repayment:
-                        decision.counter.monthly_payment *
-                        decision.counter.term_months,
-                    },
-                    {
-                      offer_id: "OPT_2",
-                      label: "Extended Tenure",
-                      principal_amount: Math.round(
-                        decision.counter.amount * 0.9,
-                      ),
-                      tenure_months: decision.counter.term_months + 12,
-                      interest_rate: decision.counter.interest_rate + 0.5,
-                      monthly_emi: Math.round(
-                        decision.counter.monthly_payment * 0.8,
-                      ),
-                      disbursement_amount: Math.round(
-                        decision.counter.amount * 0.89,
-                      ),
-                      total_repayment:
-                        Math.round(decision.counter.monthly_payment * 0.8) *
-                        (decision.counter.term_months + 12),
-                    },
-                    {
-                      offer_id: "OPT_3",
-                      label: "Lower Interest Rate",
-                      principal_amount: Math.round(
-                        decision.counter.amount * 0.8,
-                      ),
-                      tenure_months: decision.counter.term_months,
-                      interest_rate: decision.counter.interest_rate - 0.5,
-                      monthly_emi: Math.round(
-                        decision.counter.monthly_payment * 0.7,
-                      ),
-                      disbursement_amount: Math.round(
-                        decision.counter.amount * 0.79,
-                      ),
-                      total_repayment:
-                        Math.round(decision.counter.monthly_payment * 0.7) *
-                        decision.counter.term_months,
-                    },
-                  ],
-                },
-              }
-            : {
-                application_id: applicationId,
-                event: "APPLICATION_APPROVED",
-                stage: "DECISIONING",
-                status: "completed",
-                message: "Underwriting completed: application approved",
-                is_terminal: true,
-                details: {
-                  decision: "APPROVE",
-                  reason:
-                    "Applicant meets all credit criteria with strong repayment history.",
-                  approved_amount: decision.requested.amount,
-                  approved_tenure_months: decision.requested.term_months,
-                  interest_rate: decision.requested.interest_rate,
-                  monthly_emi: decision.requested.monthly_payment,
-                  processing_fee: Math.round(decision.requested.amount * 0.01),
-                  terms_summary: `Loan of $${Number(decision.requested.amount).toLocaleString()} at ${decision.requested.interest_rate}% for ${decision.requested.term_months} months. EMI: $${Number(decision.requested.monthly_payment).toLocaleString()}/month.`,
-                },
-              },
-      },
-    ];
-
-    const timers = mockSequence.map(({ delay, data }) =>
-      window.setTimeout(() => {
-        const normalized = normalizePipelinePayload(data);
-        if (normalized) {
-          onEvent?.({ event: normalized.event, data: normalized });
-        }
-      }, delay),
-    );
-
-    return () => timers.forEach(window.clearTimeout);
+    return subscribeToDemoPipeline(applicationId, onEvent, onError);
   }
 
   const es = new EventSource(
