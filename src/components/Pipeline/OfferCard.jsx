@@ -8,8 +8,8 @@ const formatCurrency = (value) =>
     maximumFractionDigits: 0,
   });
 
-const OfferRow = ({ label, value, large = false }) => (
-  <div className={`offer-row ${large ? 'offer-row--large' : ''}`}>
+const OfferRow = ({ label, value, primary = false }) => (
+  <div className={`decision-offer-row${primary ? ' decision-offer-row--primary' : ''}`}>
     <dt>{label}</dt>
     <dd>{value}</dd>
   </div>
@@ -21,19 +21,19 @@ const OfferCard = ({ title, terms, isHighlighted = false, onAccept, ctaLabel }) 
   }
 
   return (
-    <div className={`offer-card ${isHighlighted ? 'offer-card--highlighted' : ''}`}>
-      <h3 className="offer-card-title">
-        {title}
+    <div className={`counter-offer-card${isHighlighted ? ' counter-offer-card--highlighted' : ''}`}>
+      <div className="counter-offer-card-head">
+        <h3 className="counter-offer-card-title">{title}</h3>
         {terms.is_recommended && (
-          <span className="offer-recommended-badge"> ★ Recommended</span>
+          <span className="counter-offer-recommended-badge">Recommended</span>
         )}
-      </h3>
-      <dl className="offer-terms">
-        <OfferRow label="Loan Amount" value={formatCurrency(terms.amount)} />
-        <OfferRow label="Term" value={`${terms.term_months} months`} />
+      </div>
+      <dl className="decision-offer-list">
+        <OfferRow label="Loan Amount" value={formatCurrency(terms.amount)} primary />
+        <OfferRow label="Loan Term" value={`${terms.term_months} months`} />
         <OfferRow label="Interest Rate" value={`${terms.interest_rate}% p.a.`} />
         {terms.monthly_payment != null && (
-          <OfferRow label="Monthly EMI" value={`${formatCurrency(terms.monthly_payment)}/mo`} large />
+          <OfferRow label="Monthly EMI" value={`${formatCurrency(terms.monthly_payment)}/mo`} />
         )}
         {terms.disbursement_amount != null && (
           <OfferRow label="Net Disbursement" value={formatCurrency(terms.disbursement_amount)} />

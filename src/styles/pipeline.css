@@ -47,93 +47,6 @@
   margin-bottom: var(--spacing-lg);
 }
 
-.offer-cards-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 24px;
-  margin-top: 24px;
-}
-
-.offer-cards-grid--single {
-  grid-template-columns: minmax(280px, 420px);
-  justify-content: start;
-}
-
-.offer-card {
-  background: var(--bg-glass);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
-  padding: 28px;
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-  transition: transform var(--transition-base), box-shadow var(--transition-base), border-color var(--transition-base);
-}
-
-.offer-card:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--card-shadow-hover);
-}
-
-.offer-card--highlighted {
-  border-color: var(--accent-color);
-  box-shadow: var(--shadow-accent-md);
-}
-
-.offer-card--highlighted:hover {
-  box-shadow: var(--shadow-accent-md), var(--card-shadow-hover);
-}
-
-.offer-card-title {
-  font-size: var(--font-size-xl);
-}
-
-.offer-terms {
-  margin: 12px 0;
-  display: grid;
-  row-gap: 12px;
-}
-
-.offer-row {
-  display: flex;
-  justify-content: space-between;
-  gap: var(--spacing-md);
-  color: var(--text-secondary);
-}
-
-.offer-row dt {
-  color: var(--text-muted);
-}
-
-.offer-row dd {
-  font-weight: 600;
-  text-align: right;
-  color: var(--text-primary);
-}
-
-.offer-row--large dd {
-  font-size: var(--font-size-lg);
-}
-
-.offer-recommended-badge {
-  display: inline-block;
-  margin-left: 8px;
-  font-size: var(--font-size-xs);
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  color: var(--accent-color);
-  vertical-align: middle;
-}
-
-.offer-justification {
-  font-size: var(--font-size-sm);
-  color: var(--text-muted);
-  line-height: 1.5;
-  margin: 4px 0 8px;
-  border-left: 2px solid rgba(79, 172, 254, 0.3);
-  padding-left: 10px;
-}
-
 .decision-actions {
   display: flex;
   justify-content: flex-end;
@@ -153,12 +66,6 @@
   .decision-actions {
     flex-direction: column;
     align-items: stretch;
-  }
-}
-
-@media (max-width: 680px) {
-  .offer-cards-grid {
-    grid-template-columns: 1fr;
   }
 }
 

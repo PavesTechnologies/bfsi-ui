@@ -1274,6 +1274,80 @@
   }
 }
 
+/* ---- Counter-offer comparison grid ---- */
+
+.counter-offer-layout {
+  max-width: none;
+  margin: 0 auto;
+  padding: 32px 24px 8px;
+}
+
+.counter-offer-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.counter-offer-grid--single {
+  grid-template-columns: minmax(280px, 420px);
+}
+
+.counter-offer-card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--aj-border);
+  border-radius: 14px;
+  padding: 24px;
+  background: var(--aj-surface);
+}
+
+.counter-offer-card--highlighted {
+  border-color: var(--aj-blue);
+  box-shadow: 0 0 0 1px var(--aj-blue);
+}
+
+.counter-offer-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.counter-offer-card-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--aj-text-primary);
+}
+
+.counter-offer-recommended-badge {
+  flex-shrink: 0;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--aj-blue);
+  background: var(--aj-blue-tint);
+  padding: 4px 8px;
+  border-radius: 999px;
+}
+
+.counter-offer-card .decision-offer-list {
+  flex: 1;
+  margin-top: 8px;
+}
+
+.counter-offer-card .btn {
+  width: 100%;
+  margin-top: 20px;
+}
+
+@media (max-width: 640px) {
+  .counter-offer-layout {
+    padding: 24px 18px 8px;
+  }
+}
+
 /* ==========================================
    RECEIPT — full-width final "loan disbursed" page.
    Shares .aj-page's palette/topbar/hero and reuses the Decision page's

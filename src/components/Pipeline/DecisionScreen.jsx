@@ -176,25 +176,39 @@ const DecisionScreen = ({ decision, onConfirm, onDecline, onReset }) => {
   if (decisionType === 'COUNTER_OFFER') {
     const options = decision.counterOfferOptions;
     return (
-      <div className="pipeline-shell fade-in">
-        <div className="card decision-screen">
-          <div className="decision-hero">
-            <span className="decision-hero-icon">
-              <ReviewIcon />
-            </span>
-            <span className="decision-badge">Counter Offer</span>
-            <h2 className="card-title">We have alternative offers for you</h2>
-            <p className="card-subtitle">Your requested amount exceeded our lending capacity. Choose one of the options below.</p>
-          </div>
+      <div className="aj-page decision-page">
+        <div className="aj-topbar">
+          <button type="button" className="aj-topbar-btn" onClick={() => navigate(-1)}>
+            <ArrowLeftIcon /> Back
+          </button>
+          <button type="button" className="aj-topbar-btn" onClick={handleNeedHelp}>
+            Need Help?
+          </button>
+        </div>
 
-          {decision.reason && (
-            <div className="decision-summary">
-              <p><strong>Reason:</strong> {decision.reason}</p>
+        <div className="aj-hero">
+          <span className="aj-pending-badge">
+            <ReviewIcon /> Counter Offer
+          </span>
+          <h1 className="aj-hero-title">We have alternative offers for you</h1>
+          <p className="aj-hero-subtitle">
+            Your requested amount exceeded our lending capacity. Choose one of the options below to continue.
+          </p>
+        </div>
+
+        {decision.reason && (
+          <div className="decision-approval-note">
+            <ReviewIcon />
+            <div>
+              <strong>Why we couldn't match your request</strong>
+              <p>{decision.reason}</p>
             </div>
-          )}
+          </div>
+        )}
 
+        <div className="counter-offer-layout">
           {options && options.length > 0 ? (
-            <div className={`offer-cards-grid${options.length === 1 ? ' offer-cards-grid--single' : ''}`}>
+            <div className={`counter-offer-grid${options.length === 1 ? ' counter-offer-grid--single' : ''}`}>
               {options.map((opt, idx) => (
                 <OfferCard
                   key={opt.option_id || idx}
@@ -211,25 +225,27 @@ const DecisionScreen = ({ decision, onConfirm, onDecline, onReset }) => {
               ))}
             </div>
           ) : (
-            <div className="decision-summary">
-              <p>Counter offer options were not included in the event payload.</p>
-            </div>
+            <p className="decision-offer-empty">
+              Counter offer options were not included in the event payload.
+            </p>
           )}
+        </div>
 
-          <div className="decision-actions">
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={handleDecline}
-              disabled={isDeclining}
-              loading={isDeclining}
-            >
-              {isDeclining ? "Declining…" : "Decline All Offers"}
-            </Button>
-            <Button type="button" variant="outline" onClick={onReset}>
-              Start New Application
-            </Button>
+        <div className="decision-footer">
+          <div className="decision-footer-primary">
+            <p className="decision-footer-note">
+              Select an option above to continue, or decline every offer to close this application.
+            </p>
           </div>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={handleDecline}
+            disabled={isDeclining}
+            loading={isDeclining}
+          >
+            {isDeclining ? "Declining…" : "Decline All Offers"}
+          </Button>
         </div>
       </div>
     );
