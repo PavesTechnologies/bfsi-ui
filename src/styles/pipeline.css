@@ -3,13 +3,11 @@
   margin: 0 auto;
 }
 
-.pipeline-screen,
 .decision-screen {
   position: relative;
   overflow: hidden;
 }
 
-.pipeline-screen::before,
 .decision-screen::before {
   content: '';
   position: absolute;
@@ -20,28 +18,6 @@
   pointer-events: none;
 }
 
-.pipeline-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: var(--spacing-lg);
-}
-
-.pipeline-kicker {
-  display: inline-block;
-  margin-bottom: var(--spacing-xs);
-  font-size: var(--font-size-xs);
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--accent-color);
-}
-
-.pipeline-application-id {
-  color: var(--text-secondary);
-  font-family: var(--font-family-mono);
-}
-
-.pipeline-status-chip,
 .decision-badge {
   padding: 0.45rem 0.8rem;
   border-radius: var(--radius-full);
@@ -62,155 +38,6 @@
 .decision-badge--error {
   background: var(--badge-error-bg);
   border-color: var(--badge-error-border);
-  color: var(--error-color);
-}
-
-.pipeline-progress-bar {
-  height: 4px;
-  background: var(--bg-tertiary);
-  border-radius: var(--radius-full);
-  margin-bottom: 28px;
-  overflow: hidden;
-}
-
-.pipeline-progress-fill {
-  height: 100%;
-  background: var(--accent-gradient);
-  transition: width 0.6s ease;
-}
-
-.pipeline-stage-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.stage-block {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 16px 20px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-color);
-  background: var(--panel-subtle-bg);
-  transition: all 0.4s ease;
-  opacity: 0.4;
-  animation: stageReveal 0.5s ease forwards;
-}
-
-.stage-block--active {
-  opacity: 1;
-  border-color: var(--accent-color);
-  box-shadow: var(--shadow-accent-sm);
-  animation: stageReveal 0.5s ease forwards, stagePulse 2s ease-in-out infinite;
-}
-
-.stage-block--complete {
-  opacity: 1;
-  border-color: var(--success-tint-500);
-  background: var(--success-tint-60);
-}
-
-.stage-block--error {
-  opacity: 1;
-  border-color: var(--error-tint-600);
-  background: var(--error-tint-60);
-}
-
-.stage-icon {
-  width: 52px;
-  height: 52px;
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--bg-muted);
-  border: 1px solid var(--border-soft);
-  color: var(--text-primary);
-  font-size: 0.85rem;
-  letter-spacing: 0.08em;
-  font-family: var(--font-family-mono);
-  flex-shrink: 0;
-}
-
-.stage-content {
-  flex: 1;
-  display: grid;
-  gap: 3px;
-}
-
-.stage-label {
-  color: var(--text-primary);
-  font-weight: 600;
-  font-family: var(--font-family-mono);
-}
-
-.stage-description {
-  color: var(--text-muted);
-  font-size: var(--font-size-sm);
-}
-
-.stage-time {
-  color: var(--success-color);
-  font-size: var(--font-size-xs);
-}
-
-.stage-error {
-  color: var(--error-color);
-  font-size: var(--font-size-xs);
-}
-
-.stage-status-icon {
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.stage-spinner {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  border: 2px solid var(--accent-tint-200);
-  border-top-color: var(--accent-color);
-  animation: spin 0.8s linear infinite;
-}
-
-.stage-check-icon {
-  width: 24px;
-  height: 24px;
-}
-
-.stage-check-icon path {
-  stroke: var(--success-color);
-  stroke-width: 2.5;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-dasharray: 24;
-  stroke-dashoffset: 24;
-  animation: drawCheck 0.5s ease forwards;
-}
-
-.stage-error-icon {
-  color: var(--error-color);
-  font-size: 1rem;
-  font-weight: 700;
-}
-
-.pipeline-footer {
-  margin-top: var(--spacing-xl);
-  padding-top: var(--spacing-md);
-  border-top: 1px solid var(--border-color);
-  display: flex;
-  justify-content: space-between;
-  gap: var(--spacing-md);
-  color: var(--text-muted);
-  font-size: var(--font-size-sm);
-}
-
-.pipeline-footer-error {
   color: var(--error-color);
 }
 
@@ -240,11 +67,21 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-md);
+  transition: transform var(--transition-base), box-shadow var(--transition-base), border-color var(--transition-base);
+}
+
+.offer-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--card-shadow-hover);
 }
 
 .offer-card--highlighted {
   border-color: var(--accent-color);
   box-shadow: var(--shadow-accent-md);
+}
+
+.offer-card--highlighted:hover {
+  box-shadow: var(--shadow-accent-md), var(--card-shadow-hover);
 }
 
 .offer-card-title {
@@ -312,34 +149,7 @@
   color: var(--text-secondary);
 }
 
-@keyframes stagePulse {
-  0%,
-  100% {
-    box-shadow: var(--shadow-accent-pulse-low);
-  }
-  50% {
-    box-shadow: var(--shadow-accent-pulse-high);
-  }
-}
-
-@keyframes stageReveal {
-  from {
-    transform: translateY(12px);
-  }
-  to {
-    transform: translateY(0);
-  }
-}
-
-@keyframes drawCheck {
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-
 @media (max-width: 900px) {
-  .pipeline-header,
-  .pipeline-footer,
   .decision-actions {
     flex-direction: column;
     align-items: stretch;
@@ -350,13 +160,167 @@
   .offer-cards-grid {
     grid-template-columns: 1fr;
   }
+}
 
-  .stage-block {
-    padding: 14px 16px;
+/* ==========================================
+   PAGE SHELL
+   Shared background treatment for all four gated
+   post-submission screens (processing/decision/sign/receipt).
+   ========================================== */
+
+.pipeline-page-shell {
+  position: relative;
+  min-height: 100vh;
+  padding: var(--spacing-2xl) var(--spacing-lg);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.pipeline-page-shell::before,
+.pipeline-page-shell::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+}
+
+.pipeline-page-shell::before {
+  top: -180px;
+  left: -160px;
+  width: 420px;
+  height: 420px;
+  background: var(--primary-tint-150);
+}
+
+.pipeline-page-shell::after {
+  bottom: -200px;
+  right: -180px;
+  width: 460px;
+  height: 460px;
+  background: var(--accent-tint-180);
+}
+
+@media (max-width: 680px) {
+  .pipeline-page-shell {
+    padding: var(--spacing-xl) var(--spacing-md);
+  }
+}
+
+/* Restyled disbursement/decision interstitial spinner (replaces inline styles) */
+.pipeline-loading-card {
+  text-align: center;
+}
+
+.pipeline-loading-spinner {
+  width: 44px;
+  height: 44px;
+  margin: var(--spacing-xl) auto 0;
+  border-radius: 50%;
+  border: 3px solid var(--accent-tint-200);
+  border-top-color: var(--accent-color);
+  animation: spin 0.8s linear infinite;
+}
+
+/* ==========================================
+   DECISION — status icon + warning badge
+   ========================================== */
+
+.decision-hero-icon {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--spacing-sm);
+  background: var(--badge-info-bg);
+  color: var(--accent-color);
+}
+
+.decision-hero-icon svg {
+  width: 28px;
+  height: 28px;
+}
+
+.decision-hero-icon--success {
+  background: var(--badge-success-bg);
+  color: var(--success-color);
+}
+
+.decision-hero-icon--error {
+  background: var(--badge-error-bg);
+  color: var(--error-color);
+}
+
+.decision-hero-icon--warning {
+  background: var(--badge-warning-bg);
+  color: var(--warning-color);
+}
+
+.decision-badge--warning {
+  background: var(--badge-warning-bg);
+  border-color: var(--badge-warning-border);
+  color: var(--warning-color);
+}
+
+.decision-screen--rejected::before {
+  background: radial-gradient(circle, var(--error-tint-120) 0%, var(--accent-transparent) 70%);
+}
+
+/* ==========================================
+   SIGN — input group, agreement checkbox, secure note
+   (used by the redesigned full-width SignatureScreen)
+   ========================================== */
+
+.sign-input-group {
+  margin-top: var(--spacing-lg);
+}
+
+.sign-secure-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: var(--spacing-md);
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+}
+
+.sign-secure-note svg {
+  width: 12px;
+  height: 12px;
+  color: var(--success-color);
+  flex-shrink: 0;
+}
+
+.sign-agreement-checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: var(--spacing-md);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.sign-agreement-checkbox input {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  margin-top: 3px;
+  accent-color: var(--color-primary);
+}
+
+@media (max-width: 680px) {
+  .decision-hero-icon {
+    width: 48px;
+    height: 48px;
   }
 
-  .stage-icon {
-    width: 44px;
-    height: 44px;
+  .decision-hero-icon svg {
+    width: 24px;
+    height: 24px;
   }
 }

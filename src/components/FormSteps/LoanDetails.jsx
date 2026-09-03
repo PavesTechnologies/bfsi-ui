@@ -1,6 +1,7 @@
 import React from 'react';
 import Input from '../FormElements/Input';
 import Select from '../FormElements/Select';
+import StepInfoLayout from './StepInfoLayout';
 import '../../styles/components.css';
 
 const LoanDetails = ({ formData, onChange }) => {
@@ -24,12 +25,10 @@ const LoanDetails = ({ formData, onChange }) => {
     ];
 
     return (
-        <div className="card fade-in">
-            <div className="card-header">
-                <h2 className="card-title">Loan Details</h2>
-                <p className="card-subtitle">Tell us about the loan you're applying for</p>
-            </div>
-
+        <StepInfoLayout
+            title="Loan Information"
+            text="Tell us the loan type, amount, and terms you're looking for so we can match you with the right offer."
+        >
             <div className="form-grid-2">
                 <Select
                     label="Loan Type"
@@ -138,7 +137,7 @@ const LoanDetails = ({ formData, onChange }) => {
                     required
                 />
             </div>
-        </div>
+        </StepInfoLayout>
     );
 };
 

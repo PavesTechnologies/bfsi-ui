@@ -1,5 +1,6 @@
 import React from 'react';
 import Button from '../FormElements/Button';
+import StepInfoLayout from './StepInfoLayout';
 import '../../styles/components.css';
 
 const ReviewSubmit = ({ formData, onEdit }) => {
@@ -57,12 +58,10 @@ const ReviewSubmit = ({ formData, onEdit }) => {
     );
 
     return (
-        <div className="card fade-in">
-            <div className="card-header">
-                <h2 className="card-title">Review & Submit</h2>
-                <p className="card-subtitle">Please review your application before submitting</p>
-            </div>
-
+        <StepInfoLayout
+            title="Almost There"
+            text="Double-check every section below. Once submitted, you'll move on to document verification."
+        >
             {renderSection('Loan Details', {
                 loan_type: loan.loan_type,
                 credit_type: loan.credit_type,
@@ -80,7 +79,7 @@ const ReviewSubmit = ({ formData, onEdit }) => {
                 citizenship_status: applicant.citizenship_status
             }, 1)}
 
-            {formData.addresses && formData.addresses.length > 0 && (
+            {applicant.addresses && applicant.addresses.length > 0 && (
                 <div style={{
                     background: 'var(--panel-subtle-bg)',
                     border: '1px solid var(--border-color)',
@@ -90,7 +89,7 @@ const ReviewSubmit = ({ formData, onEdit }) => {
                 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--spacing-md)' }}>
                         <h3 style={{ fontSize: 'var(--font-size-lg)', fontWeight: 600, color: 'var(--text-primary)' }}>
-                            Addresses ({formData.addresses.length})
+                            Addresses ({applicant.addresses.length})
                         </h3>
                         <button
                             onClick={() => onEdit(2)}
@@ -106,9 +105,10 @@ const ReviewSubmit = ({ formData, onEdit }) => {
                             Edit
                         </button>
                     </div>
-                    {formData.addresses.map((addr, idx) => (
+                    {applicant.addresses.map((addr, idx) => (
                         <p key={idx} style={{ color: 'var(--text-secondary)', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--spacing-xs)' }}>
-                            {addr.address_type}: {addr.street}, {addr.city}, {addr.state} {addr.zip_code}
+                            {addr.address_type}: {addr.address_line1}
+                            {addr.address_line2 ? `, ${addr.address_line2}` : ''}, {addr.city}, {addr.state} {addr.zip_code}
                         </p>
                     ))}
                 </div>
@@ -183,7 +183,7 @@ const ReviewSubmit = ({ formData, onEdit }) => {
                     </label>
                 </div>
             </div>
-        </div>
+        </StepInfoLayout>
     );
 };
 

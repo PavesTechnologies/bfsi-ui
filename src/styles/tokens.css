@@ -1,0 +1,346 @@
+/* ==========================================
+   DESIGN TOKENS
+   Same token surface the app has always consumed via var(--...).
+   Values updated for a calm, premium fintech palette:
+   deep blue primary / light blue secondary / green success /
+   amber warning / red danger / very-light-gray background / white cards.
+   Switch to dark at runtime by setting data-theme="dark" on <html> or <body>.
+   ========================================== */
+
+:root,
+[data-theme='dark'] {
+  /* Brand palette */
+  --primary-100: #e8f0fe;
+  --primary-200: #c6dbfc;
+  --primary-300: #9cc0fa;
+  --primary-400: #6da1f5;
+  --primary-500: #2f6feb;
+  --primary-600: #1f56d6;
+  --primary-700: #1741a8;
+  --primary-800: #123380;
+  --primary-900: #0d2459;
+
+  --secondary-100: #eaf7fe;
+  --secondary-200: #c9ebfc;
+  --secondary-300: #9fdbfa;
+  --secondary-400: #6cc5f5;
+  --secondary-500: #38a9e8;
+  --secondary-600: #2389c4;
+  --secondary-700: #1b6c99;
+  --secondary-800: #145071;
+  --secondary-900: #0d3650;
+
+  --accent-100: #e6fbfb;
+  --accent-200: #bff3f3;
+  --accent-300: #8fe7e7;
+  --accent-400: #5ad6d6;
+  --accent-500: #22b8b8;
+  --accent-600: #1b9494;
+  --accent-700: #157373;
+  --accent-800: #0f5555;
+  --accent-900: #0a3a3a;
+
+  --cyan-500: #1b9494;
+  --pink-500: #6cc5f5;
+
+  /* State palette */
+  --success-100: #e7f8ee;
+  --success-200: #c2edd3;
+  --success-300: #92deb1;
+  --success-400: #5bcb8b;
+  --success-500: #279b58;
+  --success-600: #1f7d46;
+  --success-700: #186235;
+  --success-800: #124a28;
+  --success-900: #0c331b;
+
+  --warning-100: #fff6e0;
+  --warning-300: #ffde94;
+  --warning-500: #e8960c;
+  --warning-700: #a66a05;
+
+  --error-100: #fdebec;
+  --error-200: #f8c6c9;
+  --error-300: #f2999f;
+  --error-400: #eb6b72;
+  --error-500: #dc2e3b;
+  --error-600: #b8232f;
+  --error-700: #8f1b24;
+  --error-800: #6b141b;
+  --error-900: #470d12;
+
+  /* Neutral palette */
+  --neutral-0: #ffffff;
+  --neutral-50: #f6f7fa;
+  --neutral-100: #eef1f5;
+  --neutral-200: #dde2ea;
+  --neutral-300: #c2c9d6;
+  --neutral-400: #9aa3b5;
+  --neutral-500: #79839a;
+  --neutral-600: #5c6579;
+  --neutral-700: #3f4658;
+  --neutral-800: #262c3a;
+  --neutral-850: #1c212c;
+  --neutral-900: #12151d;
+  --neutral-950: #0a0c12;
+
+  /* Text */
+  --text-primary: var(--neutral-0);
+  --text-secondary: var(--neutral-300);
+  --text-muted: var(--neutral-500);
+  --text-inverse: var(--neutral-950);
+  --text-link: var(--primary-400);
+  --text-link-hover: var(--primary-300);
+
+  /* Backgrounds and surfaces */
+  --bg-primary: var(--neutral-900);
+  --bg-secondary: var(--neutral-850);
+  --bg-tertiary: var(--neutral-800);
+  --bg-card: rgba(38, 44, 58, 0.6);
+  --bg-glass: rgba(255, 255, 255, 0.05);
+  --bg-glass-hover: rgba(255, 255, 255, 0.08);
+  --bg-subtle: rgba(255, 255, 255, 0.02);
+  --bg-subtle-hover: rgba(255, 255, 255, 0.03);
+  --bg-muted: rgba(255, 255, 255, 0.06);
+  --bg-overlay: rgba(0, 0, 0, 0.6);
+
+  /* Borders */
+  --border-color: rgba(255, 255, 255, 0.1);
+  --border-muted: rgba(255, 255, 255, 0.04);
+  --border-soft: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.15);
+  --border-focus: rgba(47, 111, 235, 0.5);
+
+  /* Semantic colors */
+  --color-primary: var(--primary-500);
+  --color-primary-hover: var(--primary-600);
+  --color-primary-light: var(--primary-400);
+  --color-secondary: var(--secondary-500);
+  --color-accent: var(--accent-500);
+  --color-success: var(--success-500);
+  --color-success-alt: var(--success-600);
+  --color-warning: var(--warning-500);
+  --color-error: var(--error-500);
+
+  --primary-color: var(--color-primary);
+  --primary-dark: var(--color-primary-hover);
+  --primary-light: var(--color-primary-light);
+  --secondary-color: var(--color-secondary);
+  --accent-color: var(--color-accent);
+  --success-color: var(--color-success);
+  --warning-color: var(--color-warning);
+  --error-color: var(--color-error);
+
+  /* Tints */
+  --primary-tint-50: rgba(47, 111, 235, 0.05);
+  --primary-tint-100: rgba(47, 111, 235, 0.1);
+  --primary-tint-150: rgba(47, 111, 235, 0.15);
+  --primary-tint-200: rgba(47, 111, 235, 0.2);
+  --primary-tint-300: rgba(47, 111, 235, 0.3);
+  --primary-tint-400: rgba(47, 111, 235, 0.4);
+  --primary-tint-500: rgba(47, 111, 235, 0.5);
+  --primary-tint-600: rgba(47, 111, 235, 0.6);
+
+  --accent-tint-50: rgba(34, 184, 184, 0.05);
+  --accent-tint-80: rgba(34, 184, 184, 0.08);
+  --accent-tint-100: rgba(34, 184, 184, 0.1);
+  --accent-tint-120: rgba(34, 184, 184, 0.12);
+  --accent-tint-180: rgba(34, 184, 184, 0.18);
+  --accent-tint-200: rgba(34, 184, 184, 0.2);
+  --accent-tint-250: rgba(34, 184, 184, 0.25);
+  --accent-tint-350: rgba(34, 184, 184, 0.35);
+  --accent-tint-500: rgba(34, 184, 184, 0.5);
+  --accent-transparent: rgba(34, 184, 184, 0);
+  --secondary-tint-100: rgba(56, 169, 232, 0.1);
+  --secondary-tint-150: rgba(56, 169, 232, 0.15);
+
+  --success-tint-60: rgba(39, 155, 88, 0.06);
+  --success-tint-80: rgba(39, 155, 88, 0.08);
+  --success-tint-120: rgba(39, 155, 88, 0.12);
+  --success-tint-150: rgba(31, 125, 70, 0.15);
+  --success-tint-300: rgba(31, 125, 70, 0.3);
+  --success-tint-320: rgba(39, 155, 88, 0.32);
+  --success-tint-500: rgba(39, 155, 88, 0.5);
+
+  --error-tint-60: rgba(220, 46, 59, 0.06);
+  --error-tint-80: rgba(235, 107, 114, 0.08);
+  --error-tint-100: rgba(220, 46, 59, 0.1);
+  --error-tint-120: rgba(220, 46, 59, 0.12);
+  --error-tint-150: rgba(220, 46, 59, 0.15);
+  --error-tint-300: rgba(220, 46, 59, 0.3);
+  --error-tint-320: rgba(220, 46, 59, 0.32);
+  --error-tint-600: rgba(220, 46, 59, 0.6);
+
+  --warning-tint-60: rgba(232, 150, 12, 0.06);
+  --warning-tint-80: rgba(232, 150, 12, 0.08);
+  --warning-tint-120: rgba(232, 150, 12, 0.12);
+  --warning-tint-320: rgba(232, 150, 12, 0.32);
+
+  /* Gradients — kept subtle and single-hue; avoid multi-color diagonal gradients */
+  --primary-gradient: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-700) 100%);
+  --secondary-gradient: linear-gradient(135deg, var(--secondary-500) 0%, var(--secondary-600) 100%);
+  --accent-gradient: linear-gradient(135deg, var(--accent-500) 0%, var(--accent-600) 100%);
+  --success-gradient: linear-gradient(135deg, var(--success-500) 0%, var(--success-600) 100%);
+  --divider-gradient: linear-gradient(90deg, transparent, var(--border-color), transparent);
+  --app-background-effects: none;
+
+  /* Typography */
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-family-mono: 'DM Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 2rem;
+
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* Spacing */
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 0.75rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+
+  /* Radius */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-full: 999px;
+
+  /* Effects */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.3);
+  --shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.4);
+  --shadow-glow: 0 0 20px var(--primary-tint-300);
+  --shadow-primary-sm: 0 4px 15px var(--primary-tint-400);
+  --shadow-primary-md: 0 6px 20px var(--primary-tint-600);
+  --shadow-primary-ring: 0 0 0 3px var(--primary-tint-100);
+  --shadow-error-ring: 0 0 0 3px var(--error-tint-100);
+  --shadow-accent-sm: 0 0 16px var(--accent-tint-250);
+  --shadow-accent-md: 0 0 24px var(--accent-tint-200);
+  --shadow-accent-pulse-low: 0 0 12px var(--accent-tint-200);
+  --shadow-accent-pulse-high: 0 0 28px var(--accent-tint-500);
+
+  --transition-fast: 150ms ease-in-out;
+  --transition-base: 250ms ease-in-out;
+  --transition-slow: 350ms ease-in-out;
+
+  /* Component defaults */
+  --card-bg: var(--bg-card);
+  --card-border: var(--border-color);
+  --card-border-hover: var(--border-strong);
+  --card-shadow: var(--shadow-md);
+  --card-shadow-hover: var(--shadow-lg);
+
+  --input-bg: var(--bg-glass);
+  --input-bg-focus: var(--bg-glass-hover);
+  --input-border: var(--border-color);
+  --input-border-focus: var(--color-primary);
+  --input-text: var(--text-primary);
+  --input-placeholder: var(--text-muted);
+  --input-error-border: var(--color-error);
+  --select-indicator-color: #c2c9d6;
+  --select-indicator-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23c2c9d6' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+
+  --button-overlay-bg: rgba(255, 255, 255, 0.1);
+  --button-primary-bg: var(--primary-gradient);
+  --button-primary-text: var(--text-primary);
+  --button-primary-shadow: var(--shadow-primary-sm);
+  --button-primary-shadow-hover: var(--shadow-primary-md);
+  --button-secondary-bg: var(--bg-tertiary);
+  --button-secondary-bg-hover: var(--bg-card);
+  --button-secondary-text: var(--text-primary);
+  --button-outline-text: var(--color-primary);
+  --button-outline-border: var(--color-primary);
+  --button-danger-text: var(--color-error);
+  --button-danger-border: var(--color-error);
+  --button-add-text: var(--color-accent);
+  --button-add-border: var(--color-accent);
+  --button-add-bg-hover: var(--accent-tint-100);
+
+  --badge-info-bg: var(--accent-tint-120);
+  --badge-info-border: var(--accent-tint-350);
+  --badge-success-bg: var(--success-tint-120);
+  --badge-success-border: var(--success-tint-320);
+  --badge-error-bg: var(--error-tint-120);
+  --badge-error-border: var(--error-tint-320);
+  --badge-warning-bg: var(--warning-tint-120);
+  --badge-warning-border: var(--warning-tint-320);
+
+  --panel-subtle-bg: var(--bg-subtle);
+  --panel-subtle-bg-hover: var(--bg-subtle-hover);
+  --panel-info-bg: var(--accent-tint-50);
+  --panel-info-border: var(--accent-tint-200);
+  --panel-primary-bg: var(--primary-tint-50);
+  --panel-primary-border: var(--primary-tint-200);
+  --panel-error-bg: var(--error-tint-80);
+  --panel-error-border: var(--error-color);
+}
+
+:root,
+[data-theme='light'] {
+  --text-primary: var(--neutral-900);
+  --text-secondary: var(--neutral-700);
+  --text-muted: var(--neutral-500);
+  --text-inverse: var(--neutral-0);
+
+  /* Page base — a calm, very light neutral gray so white cards lift off it */
+  --bg-primary: #f5f7fa;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #eef1f5;
+  /* Cards are clean, solid white panels — no glass/translucency */
+  --bg-card: #ffffff;
+  --bg-glass: rgba(255, 255, 255, 0.85);
+  --bg-glass-hover: rgba(255, 255, 255, 0.95);
+  --bg-subtle: rgba(18, 21, 29, 0.03);
+  --bg-subtle-hover: rgba(18, 21, 29, 0.05);
+  --bg-muted: rgba(18, 21, 29, 0.06);
+
+  --border-color: rgba(18, 21, 29, 0.12);
+  --border-muted: rgba(18, 21, 29, 0.06);
+  --border-soft: rgba(18, 21, 29, 0.08);
+  --border-strong: rgba(18, 21, 29, 0.18);
+
+  /* Input elements need solid backgrounds in light mode */
+  --input-bg: #ffffff;
+  --input-bg-focus: #ffffff;
+  --input-border: rgba(18, 21, 29, 0.18);
+
+  /* Darker select arrow for light backgrounds */
+  --select-indicator-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%235c6579' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+
+  /* Soft, neutral-tinted shadows for light surfaces */
+  --shadow-sm: 0 1px 3px rgba(18, 21, 29, 0.06);
+  --shadow-md: 0 4px 12px rgba(18, 21, 29, 0.08);
+  --shadow-lg: 0 8px 24px rgba(18, 21, 29, 0.1);
+  --shadow-xl: 0 20px 48px rgba(18, 21, 29, 0.13);
+  --shadow-primary-sm: 0 2px 8px rgba(23, 65, 168, 0.28);
+  --shadow-primary-md: 0 4px 16px rgba(23, 65, 168, 0.38);
+  --shadow-glow: 0 0 16px rgba(47, 111, 235, 0.18);
+
+  /* Card elevation — white panel against the light gray background */
+  --card-bg: #ffffff;
+  --card-shadow: 0 1px 3px rgba(18, 21, 29, 0.05), 0 6px 20px rgba(18, 21, 29, 0.07);
+  --card-shadow-hover: 0 4px 10px rgba(18, 21, 29, 0.07), 0 14px 32px rgba(18, 21, 29, 0.1);
+  --card-border: rgba(18, 21, 29, 0.06);
+
+  /* Flat, professional buttons — no gradient */
+  --button-primary-bg: var(--primary-700);
+  --button-primary-text: #ffffff;
+  --button-primary-shadow: 0 2px 6px rgba(23, 65, 168, 0.3);
+  --button-primary-shadow-hover: 0 4px 14px rgba(23, 65, 168, 0.4);
+  --button-secondary-bg: var(--neutral-0);
+  --button-secondary-bg-hover: var(--neutral-50);
+  --button-secondary-text: var(--neutral-700);
+
+  --app-background-effects: none;
+}

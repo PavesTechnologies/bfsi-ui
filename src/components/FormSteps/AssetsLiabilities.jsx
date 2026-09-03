@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Input from '../FormElements/Input';
 import Select from '../FormElements/Select';
+import StepInfoLayout from './StepInfoLayout';
 import '../../styles/components.css';
 
 const AssetsLiabilities = ({ formData, onChange }) => {
@@ -95,9 +96,10 @@ const AssetsLiabilities = ({ formData, onChange }) => {
     };
 
     return (
-        <div className="card fade-in">
-            <h2 className="card-title">Assets & Liabilities</h2>
-
+        <StepInfoLayout
+            title="Your Finances"
+            text="A clear picture of what you own and owe helps us offer terms that fit your financial situation."
+        >
             {/* -------- ASSETS -------- */}
             <h3 className="section-title">Assets</h3>
 
@@ -234,7 +236,7 @@ const AssetsLiabilities = ({ formData, onChange }) => {
             <button className="btn-add" onClick={addLiability} type="button">
                 + Add Liability
             </button>
-        </div>
+        </StepInfoLayout>
     );
 };
 

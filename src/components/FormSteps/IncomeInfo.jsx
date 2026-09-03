@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Input from '../FormElements/Input';
 import Select from '../FormElements/Select';
+import StepInfoLayout from './StepInfoLayout';
 import '../../styles/components.css';
 
 const IncomeInfo = ({ formData, onChange }) => {
@@ -48,12 +49,10 @@ const IncomeInfo = ({ formData, onChange }) => {
     };
 
     return (
-        <div className="card fade-in">
-            <div className="card-header">
-                <h2 className="card-title">Income Information</h2>
-                <p className="card-subtitle">Add all sources of income</p>
-            </div>
-
+        <StepInfoLayout
+            title="Your Income"
+            text="List every source of income so we can calculate the loan amount you're eligible for."
+        >
             {incomes.map((income, index) => (
                 <div key={index} className="dynamic-list-item">
                     <div className="dynamic-list-header">
@@ -119,7 +118,7 @@ const IncomeInfo = ({ formData, onChange }) => {
             <button className="btn-add" onClick={addIncome} type="button">
                 + Add Income
             </button>
-        </div>
+        </StepInfoLayout>
     );
 };
 

@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import Button from '../FormElements/Button';
 import apiClient from '../../api/client';
-import '../../styles/components.css';
+import '../../styles/applicationJourney.css';
 
 // ─── Document Configuration ────────────────────────────────────────────────
 const DOC_CONFIG = {
@@ -49,14 +51,29 @@ const DOC_TYPE_MAP = {
     bank_statement:  'bank_statements',
     bank_statements: 'bank_statements',
 };
-// ───────────────────────────────────────────────────────────────────────────
 
-const getStatusIcon  = (s) => ({ uploading: '⏳', success: '✓', error: '✗' }[s] || '');
-const getStatusColor = (s) => ({
-    uploading: 'var(--accent-color)',
-    success:   'var(--success-color)',
-    error:     'var(--error-color)',
-}[s] || 'var(--text-muted)');
+// Left-column list: the mandatory PAN upload plus the two "pick one of N"
+// proof groups, unified so the list and status logic can treat them the same.
+const GROUPS = [
+    { kind: 'single', required: true, id: DOC_CONFIG.mandatory[0].id, label: DOC_CONFIG.mandatory[0].label, endpoint: DOC_CONFIG.mandatory[0].endpoint },
+    { kind: 'choice', required: true, ...DOC_CONFIG.proofTypes[0] },
+    { kind: 'choice', required: true, ...DOC_CONFIG.proofTypes[1] },
+];
+
+const STATUS_LABEL = {
+    idle: 'Not uploaded',
+    uploading: 'Uploading…',
+    success: 'Uploaded',
+    error: 'Upload failed',
+};
+
+function groupStatus(group, { uploading, uploadStatus, selectedProofOptions }) {
+    const docId = group.kind === 'single' ? group.id : selectedProofOptions[group.id];
+    if (!docId) return 'idle';
+    if (uploading[docId]) return 'uploading';
+    return uploadStatus[docId]?.status || 'idle';
+}
+// ───────────────────────────────────────────────────────────────────────────
 
 // ─── Shared upload hook (individual file) ───────────────────────────────────
 const useFileUpload = (applicationId, formData, onChange) => {
@@ -106,110 +123,67 @@ const useFileUpload = (applicationId, formData, onChange) => {
     return { uploadStatus, uploading, handleUpload, applyZipResults };
 };
 
-// ─── Single upload row ───────────────────────────────────────────────────────
-const UploadRow = ({ docId, endpoint, uploading, uploadStatus, onFileChange }) => (
-    <div style={{ marginTop: 'var(--spacing-sm)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-md)' }}>
+// ─── Large drag-and-drop / browse upload zone ───────────────────────────────
+const UploadZone = ({ docId, label, endpoint, uploading, uploadStatus, onFileChange }) => {
+    const [dragOver, setDragOver] = useState(false);
+    const status = uploadStatus[docId];
+    const isUploading = Boolean(uploading[docId]);
+
+    const handleFiles = (files) => {
+        const file = files?.[0];
+        if (file) onFileChange(docId, endpoint, file);
+    };
+
+    return (
+        <div className="doc-upload-zone-wrap">
             <label
-                style={{
-                    flex: 1, display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)',
-                    padding: 'var(--spacing-sm) var(--spacing-md)',
-                    background: 'var(--bg-glass)', border: '1px solid var(--border-color)',
-                    borderRadius: 'var(--radius-md)', cursor: 'pointer', transition: 'all var(--transition-base)',
+                className={`doc-upload-zone doc-upload-zone--${status?.status || 'idle'} ${dragOver ? 'doc-upload-zone--drag' : ''}`}
+                onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+                onDragLeave={() => setDragOver(false)}
+                onDrop={(e) => {
+                    e.preventDefault();
+                    setDragOver(false);
+                    if (!isUploading) handleFiles(e.dataTransfer.files);
                 }}
-                onMouseEnter={e => (e.currentTarget.style.borderColor = 'var(--primary-color)')}
-                onMouseLeave={e => (e.currentTarget.style.borderColor = 'var(--border-color)')}
             >
                 <input
                     type="file"
                     accept=".pdf,.jpg,.jpeg,.png"
-                    onChange={e => onFileChange(docId, endpoint, e.target.files[0])}
-                    disabled={uploading[docId]}
+                    onChange={(e) => handleFiles(e.target.files)}
+                    disabled={isUploading}
                     style={{ display: 'none' }}
                 />
-                <span style={{ fontSize: '20px' }}>📎</span>
-                <span style={{ color: 'var(--text-secondary)', fontSize: 'var(--font-size-sm)' }}>
-                    {uploadStatus[docId]?.fileName || 'Choose file...'}
-                </span>
+                <UploadCloudIcon />
+                {status?.status === 'success' ? (
+                    <>
+                        <span className="doc-upload-zone-title">{status.fileName}</span>
+                        <span className="doc-upload-zone-hint">
+                            Uploaded{status.fileSize ? ` · ${status.fileSize}` : ''} — click or drop to replace
+                        </span>
+                    </>
+                ) : isUploading ? (
+                    <>
+                        <span className="doc-upload-zone-title">Uploading…</span>
+                        <span className="doc-upload-zone-hint">{label}</span>
+                    </>
+                ) : (
+                    <>
+                        <span className="doc-upload-zone-title">Drag &amp; drop your {label}</span>
+                        <span className="doc-upload-zone-hint">or click to browse · PDF, JPG, PNG</span>
+                    </>
+                )}
             </label>
 
-            {uploadStatus[docId] && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-xs)', color: getStatusColor(uploadStatus[docId].status), fontSize: 'var(--font-size-sm)', fontWeight: 500 }}>
-                    <span style={{ fontSize: '18px' }}>{getStatusIcon(uploadStatus[docId].status)}</span>
-                    <span>{uploadStatus[docId].message}</span>
-                    {uploadStatus[docId].fileSize && (
-                        <span style={{ color: 'var(--text-muted)', marginLeft: 'var(--spacing-xs)' }}>
-                            ({uploadStatus[docId].fileSize})
-                        </span>
-                    )}
+            {isUploading && (
+                <div className="doc-upload-progress">
+                    <div className="doc-upload-progress-fill" />
                 </div>
             )}
+
+            {status?.status === 'error' && <p className="doc-upload-error">{status.message}</p>}
         </div>
-
-        {uploading[docId] && (
-            <div style={{ marginTop: 'var(--spacing-sm)', height: '4px', background: 'var(--bg-tertiary)', borderRadius: 'var(--radius-sm)', overflow: 'hidden' }}>
-                <div style={{ height: '100%', background: 'var(--accent-gradient)', animation: 'progress 1.5s ease-in-out infinite', width: '50%' }} />
-            </div>
-        )}
-    </div>
-);
-
-// ─── Proof-type section ──────────────────────────────────────────────────────
-const ProofSection = ({ proofType, selectedOption, onSelectOption, uploading, uploadStatus, onFileChange }) => (
-    <div className="dynamic-list-item" style={{ marginBottom: 'var(--spacing-lg)' }}>
-        <div style={{ marginBottom: 'var(--spacing-md)' }}>
-            <label style={{ display: 'block', fontSize: 'var(--font-size-base)', fontWeight: 600, color: 'var(--text-primary)', marginBottom: 'var(--spacing-xs)' }}>
-                {proofType.label}
-                <span style={{ color: 'var(--error-color)', marginLeft: '4px' }}>*</span>
-            </label>
-            <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--text-muted)', marginBottom: 'var(--spacing-sm)' }}>
-                {proofType.description}
-            </p>
-
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--spacing-sm)' }}>
-                {proofType.options.map(opt => {
-                    const isSelected = selectedOption === opt.id;
-                    const status = uploadStatus[opt.id]?.status;
-                    return (
-                        <button
-                            key={opt.id}
-                            type="button"
-                            onClick={() => onSelectOption(proofType.id, opt.id)}
-                            style={{
-                                padding: 'var(--spacing-xs) var(--spacing-md)',
-                                borderRadius: 'var(--radius-md)',
-                                border: `1px solid ${isSelected ? 'var(--primary-color)' : status === 'success' ? 'var(--success-color)' : 'var(--border-color)'}`,
-                                background: isSelected ? 'var(--accent-tint-120)' : status === 'success' ? 'var(--success-tint-80)' : 'var(--bg-glass)',
-                                color: isSelected ? 'var(--primary-color)' : status === 'success' ? 'var(--success-color)' : 'var(--text-secondary)',
-                                fontWeight: isSelected || status === 'success' ? 600 : 400,
-                                fontSize: 'var(--font-size-sm)',
-                                cursor: 'pointer',
-                                transition: 'all var(--transition-base)',
-                                display: 'flex', alignItems: 'center', gap: '6px',
-                            }}
-                        >
-                            {status === 'success' && <span>✓</span>}
-                            {opt.label}
-                        </button>
-                    );
-                })}
-            </div>
-        </div>
-
-        {selectedOption && (() => {
-            const opt = proofType.options.find(o => o.id === selectedOption);
-            return opt ? (
-                <UploadRow
-                    docId={opt.id}
-                    endpoint={opt.endpoint}
-                    uploading={uploading}
-                    uploadStatus={uploadStatus}
-                    onFileChange={onFileChange}
-                />
-            ) : null;
-        })()}
-    </div>
-);
+    );
+};
 
 // ─── ZIP upload modal ────────────────────────────────────────────────────────
 const ZipModal = ({ applicationId, onApply, onClose }) => {
@@ -342,7 +316,7 @@ const ZipModal = ({ applicationId, onApply, onClose }) => {
                 {/* Progress */}
                 {uploading && (
                     <div style={{ marginBottom: 'var(--spacing-md)', height: '4px', background: 'var(--bg-tertiary)', borderRadius: 'var(--radius-sm)', overflow: 'hidden' }}>
-                        <div style={{ height: '100%', background: 'var(--accent-gradient)', animation: 'progress 1.5s ease-in-out infinite', width: '50%' }} />
+                        <div style={{ height: '100%', background: 'var(--accent-gradient)', animation: 'doc-indeterminate 1.5s ease-in-out infinite', width: '50%' }} />
                     </div>
                 )}
 
@@ -417,10 +391,12 @@ const ZipModal = ({ applicationId, onApply, onClose }) => {
 };
 
 // ─── Main component ──────────────────────────────────────────────────────────
-const DocumentUpload = ({ formData, onChange, applicationId, onContinue }) => {
+const DocumentUpload = ({ formData, onChange, applicationId, onContinue, isContinuing = false }) => {
+    const navigate = useNavigate();
     const { uploadStatus, uploading, handleUpload, applyZipResults } = useFileUpload(applicationId, formData, onChange);
     const [selectedProofOptions, setSelectedProofOptions] = useState({});
     const [zipModalOpen, setZipModalOpen] = useState(false);
+    const [activeGroupId, setActiveGroupId] = useState(GROUPS[0].id);
 
     const handleSelectProofOption = (proofTypeId, optionId) => {
         setSelectedProofOptions(prev => ({ ...prev, [proofTypeId]: optionId }));
@@ -437,88 +413,146 @@ const DocumentUpload = ({ formData, onChange, applicationId, onContinue }) => {
         onChange({ target: { name: 'documents', value: docsMap } });
     };
 
+    const handleNeedHelp = () => {
+        toast.info("Our support team is available in-app any time — we're here if you need us.");
+    };
+
+    const activeGroup = GROUPS.find(g => g.id === activeGroupId) || GROUPS[0];
+    const activeOptionId = activeGroup.kind === 'choice' ? selectedProofOptions[activeGroup.id] : null;
+    const activeOption = activeOptionId ? activeGroup.options.find(o => o.id === activeOptionId) : null;
 
     return (
-        <div className="card fade-in">
-            <div className="card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                <div>
-                    <h2 className="card-title">Document Upload</h2>
-                    <p className="card-subtitle">Please upload the required documents for verification</p>
-                </div>
-                <button
-                    type="button"
-                    onClick={() => setZipModalOpen(true)}
-                    style={{
-                        display: 'flex', alignItems: 'center', gap: '6px',
-                        padding: 'var(--spacing-xs) var(--spacing-md)',
-                        background: 'var(--bg-glass)', border: '1px solid var(--border-color)',
-                        borderRadius: 'var(--radius-md)', color: 'var(--text-secondary)',
-                        fontSize: 'var(--font-size-sm)', cursor: 'pointer',
-                        transition: 'all var(--transition-base)', fontWeight: 500, whiteSpace: 'nowrap',
-                    }}
-                    onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--primary-color)'; e.currentTarget.style.color = 'var(--primary-color)'; }}
-                    onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border-color)'; e.currentTarget.style.color = 'var(--text-secondary)'; }}
-                >
-                    🗜️ Upload ZIP
+        <div className="aj-page doc-page">
+            <div className="aj-topbar">
+                <button type="button" className="aj-topbar-btn" onClick={() => navigate(-1)}>
+                    <ArrowLeftIcon /> Back
+                </button>
+                <button type="button" className="aj-topbar-btn" onClick={handleNeedHelp}>
+                    Need Help?
                 </button>
             </div>
 
-            <div style={{ background: 'var(--panel-info-bg)', border: '1px solid var(--panel-info-border)', borderRadius: 'var(--radius-md)', padding: 'var(--spacing-md)', marginBottom: 'var(--spacing-xl)' }}>
-                <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--spacing-xs)' }}>
-                    📋 <strong>Document Requirements:</strong>
+            <div className="aj-hero doc-hero">
+                <span className="aj-success-badge">
+                    <CheckCircleIcon /> Application Submitted
+                </span>
+                <h1 className="aj-hero-title">Upload Your Documents</h1>
+                <p className="aj-hero-subtitle">
+                    Upload the required documents to verify your identity and continue processing your loan application.
                 </p>
-                <ul style={{ color: 'var(--text-muted)', fontSize: 'var(--font-size-sm)', marginLeft: 'var(--spacing-lg)' }}>
-                    <li>Files must be in PDF, JPG, or PNG format</li>
-                    <li>Maximum file size: 10 MB per document</li>
-                    <li>Documents must be clear and legible</li>
-                    <li>PAN Card is mandatory; upload one Address Proof and one Income Proof</li>
-                </ul>
             </div>
 
-            {/* Mandatory documents */}
-            <h3 style={{ fontSize: 'var(--font-size-base)', fontWeight: 600, color: 'var(--text-primary)', marginBottom: 'var(--spacing-md)' }}>
-                Mandatory Documents
-            </h3>
-            {DOC_CONFIG.mandatory.map(doc => (
-                <div key={doc.id} className="dynamic-list-item" style={{ marginBottom: 'var(--spacing-lg)' }}>
-                    <label style={{ display: 'block', fontSize: 'var(--font-size-base)', fontWeight: 600, color: 'var(--text-primary)', marginBottom: 'var(--spacing-xs)' }}>
-                        {doc.label}
-                        <span style={{ color: 'var(--error-color)', marginLeft: '4px' }}>*</span>
-                    </label>
-                    <UploadRow
-                        docId={doc.id}
-                        endpoint={doc.endpoint}
-                        uploading={uploading}
-                        uploadStatus={uploadStatus}
-                        onFileChange={handleUpload}
-                    />
+            <div className="doc-layout">
+                <section className="doc-list-panel" aria-label="Required documents">
+                    <h2 className="doc-panel-heading">Required Documents</h2>
+                    <ul className="doc-list">
+                        {GROUPS.map((group) => {
+                            const status = groupStatus(group, { uploading, uploadStatus, selectedProofOptions });
+                            const isActive = group.id === activeGroupId;
+                            return (
+                                <li key={group.id}>
+                                    <button
+                                        type="button"
+                                        className={`doc-row doc-row--${status} ${isActive ? 'doc-row--active' : ''}`}
+                                        onClick={() => setActiveGroupId(group.id)}
+                                    >
+                                        <span className="doc-row-status-icon" aria-hidden="true">
+                                            {status === 'success' && <CheckIcon />}
+                                            {status === 'error' && <ExclaimIcon />}
+                                            {status === 'uploading' && <span className="doc-row-spinner" />}
+                                        </span>
+                                        <span className="doc-row-text">
+                                            <span className="doc-row-title">{group.label}</span>
+                                            <span className="doc-row-meta">
+                                                {group.required ? 'Required' : 'Optional'} · {STATUS_LABEL[status]}
+                                            </span>
+                                        </span>
+                                        <ChevronIcon />
+                                    </button>
+                                </li>
+                            );
+                        })}
+                    </ul>
+                </section>
+
+                <section className="doc-upload-panel" aria-label="Upload documents">
+                    <div className="doc-upload-panel-head">
+                        <h2 className="doc-panel-heading">{activeGroup.label}</h2>
+                        <button type="button" className="doc-zip-trigger" onClick={() => setZipModalOpen(true)}>
+                            🗜️ Upload ZIP instead
+                        </button>
+                    </div>
+
+                    {activeGroup.kind === 'choice' && (
+                        <>
+                            <p className="doc-upload-panel-desc">{activeGroup.description}</p>
+                            <div className="doc-option-chips">
+                                {activeGroup.options.map((opt) => {
+                                    const isSelected = activeOptionId === opt.id;
+                                    const optStatus = uploadStatus[opt.id]?.status;
+                                    return (
+                                        <button
+                                            key={opt.id}
+                                            type="button"
+                                            className={`doc-chip ${isSelected ? 'doc-chip--selected' : ''} ${optStatus === 'success' ? 'doc-chip--success' : ''}`}
+                                            onClick={() => handleSelectProofOption(activeGroup.id, opt.id)}
+                                        >
+                                            {optStatus === 'success' && <CheckIcon />}
+                                            {opt.label}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </>
+                    )}
+
+                    {activeGroup.kind === 'single' ? (
+                        <UploadZone
+                            docId={activeGroup.id}
+                            label={activeGroup.label}
+                            endpoint={activeGroup.endpoint}
+                            uploading={uploading}
+                            uploadStatus={uploadStatus}
+                            onFileChange={handleUpload}
+                        />
+                    ) : activeOption ? (
+                        <UploadZone
+                            docId={activeOption.id}
+                            label={activeOption.label}
+                            endpoint={activeOption.endpoint}
+                            uploading={uploading}
+                            uploadStatus={uploadStatus}
+                            onFileChange={handleUpload}
+                        />
+                    ) : (
+                        <div className="doc-upload-placeholder">Select a document type above to upload.</div>
+                    )}
+
+                    <p className="doc-upload-caption">
+                        Supported formats: PDF, JPG, PNG · Maximum size: 10 MB per document
+                    </p>
+                </section>
+
+                <div className="doc-guidelines">
+                    <h3 className="doc-guidelines-title">Upload Guidelines</h3>
+                    <ul>
+                        <li>PDF, JPG, PNG supported</li>
+                        <li>Maximum 10 MB per document</li>
+                        <li>Documents must be clear and readable</li>
+                        <li>PAN Card is mandatory</li>
+                    </ul>
                 </div>
-            ))}
+            </div>
 
-            {/* Proof-type sections */}
-            <h3 style={{ fontSize: 'var(--font-size-base)', fontWeight: 600, color: 'var(--text-primary)', margin: 'var(--spacing-xl) 0 var(--spacing-md)' }}>
-                Supporting Documents
-            </h3>
-            {DOC_CONFIG.proofTypes.map(pt => (
-                <ProofSection
-                    key={pt.id}
-                    proofType={pt}
-                    selectedOption={selectedProofOptions[pt.id]}
-                    onSelectOption={handleSelectProofOption}
-                    uploading={uploading}
-                    uploadStatus={uploadStatus}
-                    onFileChange={handleUpload}
-                />
-            ))}
-
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 'var(--spacing-xl)' }}>
+            <div className="doc-footer">
                 <Button
                     type="button"
                     variant="primary"
                     onClick={onContinue}
-                    // disabled={!canContinue}
+                    disabled={isContinuing}
+                    loading={isContinuing}
                 >
-                    Continue To Verification
+                    {isContinuing ? "Submitting…" : "Continue To Verification"}
                 </Button>
             </div>
 
@@ -529,15 +563,46 @@ const DocumentUpload = ({ formData, onChange, applicationId, onContinue }) => {
                     onClose={() => setZipModalOpen(false)}
                 />
             )}
-
-            <style>{`
-                @keyframes progress {
-                    0% { transform: translateX(-100%); }
-                    100% { transform: translateX(300%); }
-                }
-            `}</style>
         </div>
     );
 };
+
+const ArrowLeftIcon = () => (
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+        <path d="M10 3 5 8l5 5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+);
+
+const CheckCircleIcon = () => (
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+        <circle cx="8" cy="8" r="6.5" />
+        <path d="M5.2 8.2 7.2 10.2 11 6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+);
+
+const CheckIcon = () => (
+    <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.4" aria-hidden="true">
+        <path d="M3.5 8.5 6.5 11.5 12.5 4.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+);
+
+const ExclaimIcon = () => (
+    <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <path d="M8 2a1 1 0 0 1 1 1v6a1 1 0 1 1-2 0V3a1 1 0 0 1 1-1zm0 10.5a1.1 1.1 0 1 1 0 2.2 1.1 1.1 0 0 1 0-2.2z" />
+    </svg>
+);
+
+const ChevronIcon = () => (
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+        <path d="M6 3l5 5-5 5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+);
+
+const UploadCloudIcon = () => (
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
+        <path d="M7 18a4.5 4.5 0 0 1-.4-8.98A5.5 5.5 0 0 1 17.4 8.06 4 4 0 0 1 17 18H7z" strokeLinejoin="round" />
+        <path d="M12 11v6.5M9.5 13.5 12 11l2.5 2.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+);
 
 export default DocumentUpload;

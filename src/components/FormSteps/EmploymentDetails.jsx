@@ -2,6 +2,7 @@ import React from 'react';
 import Input from '../FormElements/Input';
 import Select from '../FormElements/Select';
 import DatePicker from '../FormElements/DatePicker';
+import StepInfoLayout from './StepInfoLayout';
 import '../../styles/components.css';
 
 const EmploymentDetails = ({ formData, onChange }) => {
@@ -33,12 +34,10 @@ const EmploymentDetails = ({ formData, onChange }) => {
     ];
 
     return (
-        <div className="card fade-in">
-            <div className="card-header">
-                <h2 className="card-title">Employment Details</h2>
-                <p className="card-subtitle">Tell us about your current employment</p>
-            </div>
-
+        <StepInfoLayout
+            title="Your Work"
+            text="Employment details help us understand your income stability and assess your loan eligibility."
+        >
             <div className="form-grid-2">
                 <Select
                     label="Employment Type"
@@ -194,7 +193,7 @@ const EmploymentDetails = ({ formData, onChange }) => {
                     </span>
                 </label>
             </div>
-        </div>
+        </StepInfoLayout>
     );
 };
 

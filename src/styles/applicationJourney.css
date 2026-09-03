@@ -1,0 +1,1820 @@
+/* ==========================================
+   APPLICATION JOURNEY — loan processing status page
+   A dedicated, premium fintech palette local to this page only.
+   ========================================== */
+
+.aj-page {
+  --aj-bg: #f7f7f5;
+  --aj-surface: #ffffff;
+  --aj-border: #e8e9e5;
+  --aj-text-primary: #172033;
+  --aj-text-secondary: #667085;
+  --aj-blue: #2457a6;
+  --aj-blue-tint: rgba(36, 87, 166, 0.08);
+  --aj-violet: #6d5dfb;
+  --aj-violet-tint: rgba(109, 93, 251, 0.1);
+  --aj-success: #20a36a;
+  --aj-success-tint: rgba(32, 163, 106, 0.1);
+  --aj-error: #c0392b;
+  --aj-error-tint: rgba(192, 57, 43, 0.08);
+
+  min-height: 100vh;
+  background: var(--aj-bg);
+  color: var(--aj-text-primary);
+  font-family: var(--font-family);
+}
+
+/* ---- Top bar ---- */
+
+.aj-topbar {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 22px 24px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.aj-topbar-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--aj-text-secondary);
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+.aj-topbar-btn:hover {
+  color: var(--aj-blue);
+  background: var(--aj-blue-tint);
+}
+
+.aj-topbar-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.aj-topbar-btn:disabled:hover {
+  color: var(--aj-text-secondary);
+  background: none;
+}
+
+/* ---- Hero ---- */
+
+.aj-hero {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 28px 24px 40px;
+}
+
+.aj-hero-title {
+  font-size: clamp(1.5rem, 2.6vw, 2rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  max-width: 640px;
+  margin-bottom: 10px;
+}
+
+.aj-hero-subtitle {
+  font-size: 1rem;
+  color: var(--aj-text-secondary);
+  max-width: 560px;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.aj-app-id {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: var(--aj-text-secondary);
+  background: var(--aj-surface);
+  border: 1px solid var(--aj-border);
+  padding: 8px 16px;
+  border-radius: 999px;
+}
+
+.aj-app-id strong {
+  color: var(--aj-text-primary);
+  font-weight: 600;
+  font-family: var(--font-family-mono);
+  letter-spacing: 0.01em;
+}
+
+/* ---- Two-column layout ---- */
+
+.aj-columns {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 24px 56px;
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  gap: 56px;
+  align-items: start;
+}
+
+/* ---- Left: journey stepper ---- */
+
+.aj-journey {
+  padding-top: 8px;
+}
+
+.aj-journey-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.aj-journey-item {
+  display: flex;
+  gap: 18px;
+}
+
+.aj-journey-marker-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.aj-journey-dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: var(--aj-surface);
+  border: 2px solid var(--aj-border);
+  color: var(--aj-text-secondary);
+  transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.aj-journey-line {
+  width: 2px;
+  flex: 1;
+  min-height: 28px;
+  background: var(--aj-border);
+  margin: 4px 0;
+  transition: background 0.3s ease;
+}
+
+.aj-journey-copy {
+  flex: 1;
+  padding-bottom: 30px;
+}
+
+.aj-journey-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--aj-text-primary);
+  margin-bottom: 4px;
+}
+
+.aj-journey-desc {
+  display: block;
+  font-size: 0.875rem;
+  color: var(--aj-text-secondary);
+  line-height: 1.55;
+  max-width: 40ch;
+}
+
+.aj-journey-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--aj-violet);
+  background: var(--aj-violet-tint);
+  padding: 3px 9px;
+  border-radius: 999px;
+}
+
+/* Completed */
+.aj-journey-item--complete .aj-journey-dot {
+  background: var(--aj-success);
+  border-color: var(--aj-success);
+  color: #ffffff;
+}
+
+.aj-journey-item--complete .aj-journey-line {
+  background: var(--aj-success);
+  opacity: 0.35;
+}
+
+/* Active */
+.aj-journey-item--active .aj-journey-dot {
+  border-color: var(--aj-violet);
+  box-shadow: 0 0 0 5px var(--aj-violet-tint);
+}
+
+.aj-journey-dot-core {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--aj-violet);
+  animation: aj-dot-pulse 1.8s ease-in-out infinite;
+}
+
+/* Error */
+.aj-journey-item--error .aj-journey-dot {
+  border-color: var(--aj-error);
+  color: var(--aj-error);
+  background: var(--aj-error-tint);
+}
+
+/* Pending — quieter */
+.aj-journey-item--pending .aj-journey-title,
+.aj-journey-item--pending .aj-journey-desc {
+  color: var(--aj-text-secondary);
+  opacity: 0.75;
+}
+
+.aj-journey-item--pending .aj-journey-title {
+  font-weight: 500;
+}
+
+/* ---- Right: status panel ---- */
+
+.aj-status-panel {
+  background: var(--aj-surface);
+  border: 1px solid var(--aj-border);
+  border-radius: 22px;
+  padding: 32px;
+  box-shadow: 0 1px 2px rgba(23, 32, 51, 0.04), 0 16px 40px rgba(23, 32, 51, 0.05);
+}
+
+.aj-status-panel--error {
+  border-color: rgba(192, 57, 43, 0.25);
+}
+
+.aj-status-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--aj-violet);
+  margin-bottom: 22px;
+}
+
+.aj-status-panel--error .aj-status-kicker {
+  color: var(--aj-error);
+}
+
+.aj-live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: aj-dot-pulse 1.6s ease-in-out infinite;
+}
+
+.aj-orb-row {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  margin-bottom: 26px;
+}
+
+.aj-orb {
+  position: relative;
+  width: 88px;
+  height: 88px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.aj-orb::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, var(--aj-violet) 0%, var(--aj-blue) 35%, transparent 65%);
+  animation: aj-orb-spin 3.4s linear infinite;
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 5px), #000 calc(100% - 5px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 5px), #000 calc(100% - 5px));
+}
+
+.aj-orb-core {
+  position: absolute;
+  inset: 12px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 28%, var(--aj-violet-tint), rgba(109, 93, 251, 0.02) 70%);
+  animation: aj-orb-pulse 2.6s ease-in-out infinite;
+}
+
+.aj-orb-percent {
+  position: relative;
+  z-index: 1;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--aj-text-primary);
+}
+
+.aj-status-copy {
+  min-width: 0;
+}
+
+.aj-status-heading {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--aj-text-primary);
+  margin-bottom: 6px;
+  letter-spacing: -0.01em;
+}
+
+.aj-status-body {
+  font-size: 0.9rem;
+  color: var(--aj-text-secondary);
+  line-height: 1.55;
+}
+
+.aj-progress-track {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--aj-border);
+  overflow: hidden;
+}
+
+.aj-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--aj-blue), var(--aj-violet));
+  transition: width 0.5s ease;
+}
+
+.aj-progress-caption {
+  display: block;
+  margin-top: 10px;
+  font-size: 0.78rem;
+  color: var(--aj-text-secondary);
+}
+
+.aj-activity-heading {
+  margin: 28px 0 14px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--aj-text-secondary);
+}
+
+.aj-activity-list {
+  list-style: none;
+  margin: 0 0 26px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+
+.aj-activity-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.875rem;
+  color: var(--aj-text-secondary);
+}
+
+.aj-activity-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.aj-activity-item--complete {
+  color: var(--aj-text-primary);
+}
+
+.aj-activity-item--complete .aj-activity-icon {
+  color: var(--aj-success);
+}
+
+.aj-activity-item--active {
+  color: var(--aj-violet);
+  font-weight: 600;
+}
+
+.aj-activity-dot-core {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--aj-violet);
+  animation: aj-dot-pulse 1.6s ease-in-out infinite;
+}
+
+.aj-estimate {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-top: 22px;
+  border-top: 1px solid var(--aj-border);
+  color: var(--aj-text-secondary);
+}
+
+.aj-estimate svg {
+  flex-shrink: 0;
+  color: var(--aj-blue);
+}
+
+.aj-estimate-label {
+  font-size: 0.85rem;
+}
+
+.aj-estimate-value {
+  margin-left: auto;
+  font-weight: 700;
+  color: var(--aj-text-primary);
+  font-size: 0.9rem;
+}
+
+/* ---- Bottom trust bar ---- */
+
+.aj-trust {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 32px 24px 56px;
+  border-top: 1px solid var(--aj-border);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 28px;
+}
+
+.aj-trust-item {
+  flex: 1;
+  min-width: 220px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.aj-trust-icon {
+  font-size: 1.05rem;
+  line-height: 1;
+  margin-top: 1px;
+}
+
+.aj-trust-title {
+  display: block;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--aj-text-primary);
+  margin-bottom: 2px;
+}
+
+.aj-trust-desc {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--aj-text-secondary);
+  line-height: 1.5;
+}
+
+.aj-trust-link {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--aj-blue);
+}
+
+.aj-trust-link:hover {
+  text-decoration: underline;
+}
+
+/* ---- Animations ---- */
+
+@keyframes aj-orb-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes aj-orb-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+}
+
+@keyframes aj-dot-pulse {
+  0%, 100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.3);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aj-orb::before,
+  .aj-orb-core,
+  .aj-live-dot,
+  .aj-journey-dot-core,
+  .aj-activity-dot-core {
+    animation: none;
+  }
+}
+
+/* ---- Responsive ---- */
+
+@media (max-width: 900px) {
+  .aj-columns {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+}
+
+@media (max-width: 640px) {
+  .aj-topbar {
+    padding: 18px 18px 0;
+  }
+  .aj-hero {
+    padding: 24px 18px 32px;
+  }
+  .aj-columns {
+    padding: 0 18px 40px;
+  }
+  .aj-status-panel {
+    padding: 24px 20px;
+  }
+  .aj-orb-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .aj-trust {
+    padding: 28px 18px 44px;
+    flex-direction: column;
+  }
+}
+
+/* ==========================================
+   DOCUMENT UPLOAD — full-width post-submission page.
+   Shares .aj-page's palette/topbar/hero; widens the content column and
+   swaps the single-column card for a two-panel layout.
+   ========================================== */
+
+.doc-page .aj-topbar,
+.doc-page .aj-hero,
+.doc-layout,
+.doc-footer {
+  max-width: 1440px;
+}
+
+.doc-page .aj-hero {
+  border-bottom: 1px solid var(--aj-border);
+  padding-bottom: 28px;
+}
+
+/* Shared small success pill — "Application Submitted" (Documents page),
+   "Application Approved" (Decision page), etc. */
+.aj-success-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--aj-success);
+  background: var(--aj-success-tint);
+  border: 1px solid rgba(32, 163, 106, 0.25);
+  padding: 6px 12px;
+  border-radius: 999px;
+  margin-bottom: 14px;
+}
+
+.aj-success-badge svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+/* Same shape as .aj-success-badge, error/pending variants for outcomes
+   that must never be dressed up as a success. */
+.aj-error-badge,
+.aj-pending-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 6px 12px;
+  border-radius: 999px;
+  margin-bottom: 14px;
+}
+
+.aj-error-badge {
+  color: var(--aj-error);
+  background: var(--aj-error-tint);
+  border: 1px solid rgba(192, 57, 43, 0.25);
+}
+
+.aj-error-badge svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.aj-pending-badge {
+  color: var(--aj-blue);
+  background: var(--aj-blue-tint);
+  border: 1px solid rgba(36, 87, 166, 0.25);
+}
+
+.doc-layout {
+  margin: 0 auto;
+  padding: 32px 24px 24px;
+  display: grid;
+  grid-template-columns: 2fr 3fr;
+  grid-template-areas:
+    "list upload"
+    "guidelines upload";
+  gap: 8px 48px;
+  align-items: start;
+}
+
+.doc-list-panel {
+  grid-area: list;
+}
+
+.doc-upload-panel {
+  grid-area: upload;
+}
+
+.doc-guidelines {
+  grid-area: guidelines;
+}
+
+.doc-panel-heading {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--aj-text-secondary);
+  margin: 0 0 16px;
+}
+
+/* ---- Left: compact document list ---- */
+
+.doc-list {
+  list-style: none;
+  margin: 0 0 28px;
+  padding: 0;
+  border-top: 1px solid var(--aj-border);
+}
+
+.doc-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 10px;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--aj-border);
+  text-align: left;
+  cursor: pointer;
+  border-radius: 10px;
+  transition: background 0.2s ease;
+}
+
+.doc-row:hover {
+  background: var(--aj-blue-tint);
+}
+
+.doc-row--active {
+  background: var(--aj-blue-tint);
+}
+
+.doc-row-status-icon {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--aj-border);
+  color: var(--aj-text-secondary);
+}
+
+.doc-row--success .doc-row-status-icon {
+  background: var(--aj-success);
+  border-color: var(--aj-success);
+  color: #fff;
+}
+
+.doc-row--error .doc-row-status-icon {
+  background: var(--aj-error-tint);
+  border-color: var(--aj-error);
+  color: var(--aj-error);
+}
+
+.doc-row--uploading .doc-row-status-icon {
+  border-color: var(--aj-violet);
+}
+
+.doc-row-spinner {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  border: 2px solid var(--aj-violet-tint);
+  border-top-color: var(--aj-violet);
+  animation: spin 0.8s linear infinite;
+}
+
+.doc-row-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.doc-row-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--aj-text-primary);
+}
+
+.doc-row-meta {
+  font-size: 0.78rem;
+  color: var(--aj-text-secondary);
+}
+
+.doc-row > svg:last-child {
+  flex-shrink: 0;
+  color: var(--aj-text-secondary);
+  opacity: 0.6;
+}
+
+.doc-guidelines {
+  padding-top: 18px;
+  border-top: 1px solid var(--aj-border);
+}
+
+.doc-guidelines-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--aj-text-primary);
+  margin: 0 0 8px;
+}
+
+.doc-guidelines ul {
+  margin: 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.doc-guidelines li {
+  font-size: 0.8rem;
+  color: var(--aj-text-secondary);
+  line-height: 1.5;
+}
+
+/* ---- Right: upload panel ---- */
+
+.doc-upload-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 6px;
+}
+
+.doc-upload-panel-head .doc-panel-heading {
+  margin: 0;
+}
+
+.doc-zip-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--aj-surface);
+  border: 1px solid var(--aj-border);
+  border-radius: 999px;
+  padding: 7px 14px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--aj-text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.doc-zip-trigger:hover {
+  border-color: var(--aj-blue);
+  color: var(--aj-blue);
+}
+
+.doc-upload-panel-desc {
+  font-size: 0.85rem;
+  color: var(--aj-text-secondary);
+  margin: 0 0 14px;
+}
+
+.doc-option-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.doc-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--aj-border);
+  background: var(--aj-surface);
+  color: var(--aj-text-secondary);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+.doc-chip--selected {
+  border-color: var(--aj-blue);
+  background: var(--aj-blue-tint);
+  color: var(--aj-blue);
+  font-weight: 600;
+}
+
+.doc-chip--success {
+  border-color: var(--aj-success);
+  background: var(--aj-success-tint);
+  color: var(--aj-success);
+  font-weight: 600;
+}
+
+.doc-upload-zone-wrap {
+  margin-bottom: 8px;
+}
+
+.doc-upload-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-align: center;
+  min-height: 200px;
+  padding: 32px 24px;
+  border-radius: 16px;
+  border: 2px dashed var(--aj-border);
+  background: var(--aj-surface);
+  color: var(--aj-text-secondary);
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.doc-upload-zone svg {
+  color: var(--aj-blue);
+  margin-bottom: 4px;
+}
+
+.doc-upload-zone--drag {
+  border-color: var(--aj-blue);
+  background: var(--aj-blue-tint);
+}
+
+.doc-upload-zone--success {
+  border-style: solid;
+  border-color: var(--aj-success);
+  background: var(--aj-success-tint);
+}
+
+.doc-upload-zone--success svg {
+  color: var(--aj-success);
+}
+
+.doc-upload-zone--error {
+  border-color: var(--aj-error);
+  background: var(--aj-error-tint);
+}
+
+.doc-upload-zone-title {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--aj-text-primary);
+}
+
+.doc-upload-zone-hint {
+  font-size: 0.8rem;
+  color: var(--aj-text-secondary);
+}
+
+.doc-upload-progress {
+  height: 4px;
+  margin-top: 10px;
+  border-radius: 999px;
+  background: var(--aj-border);
+  overflow: hidden;
+}
+
+.doc-upload-progress-fill {
+  width: 40%;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--aj-blue), var(--aj-violet));
+  animation: doc-indeterminate 1.4s ease-in-out infinite;
+}
+
+.doc-upload-error {
+  margin: 8px 0 0;
+  font-size: 0.8rem;
+  color: var(--aj-error);
+}
+
+.doc-upload-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  padding: 24px;
+  border-radius: 16px;
+  background: var(--aj-blue-tint);
+  color: var(--aj-text-secondary);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.doc-upload-caption {
+  margin: 14px 0 0;
+  font-size: 0.78rem;
+  color: var(--aj-text-secondary);
+}
+
+/* ---- Footer action bar ---- */
+
+.doc-footer {
+  margin: 0 auto;
+  padding: 20px 24px 48px;
+  border-top: 1px solid var(--aj-border);
+  display: flex;
+  justify-content: flex-end;
+}
+
+@keyframes doc-indeterminate {
+  0% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(340%);
+  }
+}
+
+@media (max-width: 1024px) {
+  .doc-layout {
+    grid-template-columns: 1fr 1.3fr;
+    gap: 8px 28px;
+    padding: 28px 20px 20px;
+  }
+}
+
+@media (max-width: 720px) {
+  .doc-layout {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "list"
+      "upload"
+      "guidelines";
+    gap: 28px;
+  }
+}
+
+@media (max-width: 640px) {
+  .doc-footer {
+    padding: 18px 18px 40px;
+  }
+}
+
+/* ==========================================
+   DECISION — full-width approved-offer page.
+   Shares .aj-page's palette/topbar/hero; same visual language as the
+   Document Upload redesign, just with a 60/40 offer/next-steps split.
+   ========================================== */
+
+.decision-page .aj-topbar,
+.decision-page .aj-hero {
+  max-width: none;
+}
+
+.decision-page .aj-hero {
+  border-bottom: 1px solid var(--aj-border);
+  padding-bottom: 28px;
+}
+
+.decision-approval-note {
+  max-width: none;
+  margin: 0 auto;
+  padding: 20px 24px 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.decision-approval-note svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--aj-success);
+}
+
+.decision-approval-note strong {
+  display: block;
+  font-size: 0.92rem;
+  color: var(--aj-text-primary);
+  margin-bottom: 2px;
+}
+
+.decision-approval-note p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--aj-text-secondary);
+  line-height: 1.55;
+}
+
+.decision-approval-note--error svg {
+  color: var(--aj-error);
+}
+
+/* Single-column variant of the offer/next-steps layout, for a page that
+   only needs one panel (e.g. a declined application's detail list). */
+.decision-declined-details {
+  max-width: none;
+  margin: 0 auto;
+  padding: 24px 24px 8px;
+}
+
+/* Brief blocking moment (accepting an offer / disbursing funds) between
+   the decision and its outcome — reuses the Processing page's orb so the
+   same "AI is working" visual language carries through the whole flow. */
+.decision-processing {
+  max-width: 480px;
+  margin: 100px auto 0;
+  padding: 0 24px 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  text-align: center;
+}
+
+.decision-layout {
+  max-width: none;
+  margin: 0 auto;
+  padding: 32px 24px 24px;
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: 56px;
+  align-items: start;
+}
+
+/* ---- Left: approved offer ---- */
+
+.decision-offer-list {
+  margin: 0;
+  border-top: 1px solid var(--aj-border);
+}
+
+.decision-offer-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 4px;
+  border-bottom: 1px solid var(--aj-border);
+}
+
+.decision-offer-row dt {
+  color: var(--aj-text-secondary);
+  font-size: 0.9rem;
+}
+
+.decision-offer-row dd {
+  margin: 0;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--aj-text-primary);
+  text-align: right;
+}
+
+.decision-offer-row--primary {
+  padding: 20px 4px;
+}
+
+.decision-offer-row--primary dt {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--aj-text-primary);
+}
+
+.decision-offer-row--primary dd {
+  font-size: 1.9rem;
+  color: var(--aj-blue);
+}
+
+.decision-offer-empty {
+  padding-top: 16px;
+  border-top: 1px solid var(--aj-border);
+  color: var(--aj-text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.decision-offer-summary {
+  margin: 18px 0 0;
+  font-size: 0.85rem;
+  color: var(--aj-text-secondary);
+  line-height: 1.6;
+}
+
+/* ---- Right: what's next ---- */
+
+.decision-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.decision-steps li {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.decision-step-index {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--aj-blue-tint);
+  color: var(--aj-blue);
+  font-weight: 700;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.decision-steps strong {
+  display: block;
+  font-size: 0.92rem;
+  color: var(--aj-text-primary);
+  margin-bottom: 3px;
+}
+
+.decision-steps p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--aj-text-secondary);
+  line-height: 1.55;
+}
+
+/* ---- Footer actions ---- */
+
+.decision-footer {
+  max-width: none;
+  margin: 0 auto;
+  padding: 24px 24px 56px;
+  border-top: 1px solid var(--aj-border);
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.decision-footer-primary {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.decision-footer-note {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--aj-text-secondary);
+  max-width: 44ch;
+}
+
+@media (max-width: 1024px) {
+  .decision-layout {
+    grid-template-columns: 1.3fr 1fr;
+    gap: 32px;
+    padding: 28px 20px 20px;
+  }
+}
+
+@media (max-width: 720px) {
+  .decision-layout {
+    grid-template-columns: 1fr;
+  }
+  .decision-footer {
+    align-items: stretch;
+  }
+  .decision-footer-primary .btn-primary {
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .decision-approval-note {
+    padding: 18px 18px 0;
+  }
+  .decision-declined-details {
+    padding: 20px 18px 8px;
+  }
+  .decision-footer {
+    padding: 20px 18px 44px;
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+/* ==========================================
+   RECEIPT — full-width final "loan disbursed" page.
+   Shares .aj-page's palette/topbar/hero and reuses the Decision page's
+   .decision-offer-list row primitives for the two detail columns.
+   ========================================== */
+
+.receipt-page .aj-topbar,
+.receipt-page .aj-hero {
+  max-width: none;
+}
+
+/* Compact header: this page prioritizes the financial data below it, so
+   the hero is deliberately tighter than the shared .aj-hero default used
+   by Documents/Processing/Decision. */
+.receipt-page .aj-hero {
+  border-bottom: 1px solid var(--aj-border);
+  padding: 16px 24px 16px;
+}
+
+.receipt-page .aj-success-badge {
+  margin-bottom: 6px;
+}
+
+.receipt-page .aj-hero-title {
+  max-width: none;
+  font-size: clamp(1.4rem, 2.4vw, 1.85rem);
+  margin-bottom: 6px;
+}
+
+.receipt-page .aj-hero-subtitle {
+  max-width: 760px;
+  margin-bottom: 10px;
+}
+
+@media (min-width: 721px) {
+  .receipt-page .aj-hero-title {
+    white-space: nowrap;
+  }
+}
+
+.receipt-explanation {
+  margin: 4px 0 0;
+  font-size: 0.85rem;
+  color: var(--aj-text-secondary);
+  max-width: 560px;
+}
+
+.receipt-id-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.receipt-status-pill {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.receipt-status-pill--success {
+  background: var(--aj-success-tint);
+  color: var(--aj-success);
+}
+
+.receipt-status-pill--error {
+  background: var(--aj-error-tint);
+  color: var(--aj-error);
+}
+
+.receipt-layout {
+  max-width: none;
+  margin: 0 auto;
+  padding: 20px 24px 8px;
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 56px;
+  align-items: start;
+}
+
+.receipt-emi-highlight {
+  margin-bottom: 18px;
+}
+
+.receipt-emi-value {
+  display: block;
+  font-size: 2.4rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--aj-blue);
+  line-height: 1.1;
+}
+
+.receipt-emi-caption {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.85rem;
+  color: var(--aj-text-secondary);
+}
+
+/* ---- Loan journey ---- */
+
+.receipt-journey {
+  max-width: none;
+  margin: 24px auto 0;
+  padding: 24px 24px 0;
+  border-top: 1px solid var(--aj-border);
+}
+
+.receipt-journey-list {
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.receipt-journey-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--aj-text-primary);
+  white-space: nowrap;
+}
+
+.receipt-journey-item svg {
+  width: 15px;
+  height: 15px;
+  color: var(--aj-success);
+  flex-shrink: 0;
+}
+
+.receipt-journey-item:not(:last-child)::after {
+  content: '→';
+  margin-left: 10px;
+  color: var(--aj-text-secondary);
+  font-weight: 400;
+}
+
+/* ---- What's next ---- */
+
+.receipt-next {
+  max-width: none;
+  margin: 24px auto 0;
+  padding: 24px 24px 0;
+  border-top: 1px solid var(--aj-border);
+}
+
+.receipt-next-lead {
+  margin: 12px 0 4px;
+  font-size: 0.95rem;
+  color: var(--aj-text-primary);
+}
+
+.receipt-next-note {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--aj-text-secondary);
+  max-width: 60ch;
+  line-height: 1.55;
+}
+
+.receipt-schedule-link {
+  display: inline-block;
+  margin-top: 12px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--aj-blue);
+}
+
+.receipt-schedule-link:hover {
+  text-decoration: underline;
+}
+
+/* ---- Schedule preview ---- */
+
+.receipt-schedule {
+  max-width: none;
+  margin: 24px auto 0;
+  padding: 24px 24px 0;
+  border-top: 1px solid var(--aj-border);
+  scroll-margin-top: 24px;
+}
+
+.receipt-schedule-note {
+  margin: 6px 0 16px;
+  font-size: 0.8rem;
+  color: var(--aj-text-secondary);
+}
+
+.receipt-table-wrapper {
+  overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid var(--aj-border);
+}
+
+.receipt-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.receipt-table th {
+  background: var(--aj-blue-tint);
+  color: var(--aj-text-secondary);
+  font-weight: 600;
+  text-align: right;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--aj-border);
+  white-space: nowrap;
+}
+
+.receipt-table th:first-child {
+  text-align: center;
+}
+
+.receipt-table td {
+  color: var(--aj-text-primary);
+  text-align: right;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--aj-border);
+}
+
+.receipt-table td:first-child {
+  text-align: center;
+  color: var(--aj-text-secondary);
+}
+
+.receipt-table tbody tr:hover {
+  background: var(--aj-blue-tint);
+}
+
+.receipt-table-ellipsis td {
+  text-align: center;
+  color: var(--aj-text-secondary);
+  padding: 6px;
+  letter-spacing: 0.2em;
+  border-bottom: 1px dashed var(--aj-border);
+}
+
+.receipt-table-row--last td {
+  background: var(--aj-success-tint);
+  font-weight: 600;
+}
+
+/* ---- Footer actions ---- */
+
+.receipt-footer {
+  max-width: none;
+  margin: 0 auto;
+  padding: 24px 24px 56px;
+  margin-top: 24px;
+  border-top: 1px solid var(--aj-border);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+}
+
+@media (max-width: 1024px) {
+  .receipt-layout {
+    gap: 32px;
+    padding: 18px 20px 8px;
+  }
+  .receipt-journey,
+  .receipt-next,
+  .receipt-schedule,
+  .receipt-footer {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}
+
+@media (max-width: 720px) {
+  .receipt-layout {
+    grid-template-columns: 1fr;
+  }
+  .receipt-journey-list {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .receipt-journey-item:not(:last-child)::after {
+    content: '';
+  }
+}
+
+@media (max-width: 640px) {
+  .receipt-page .aj-hero {
+    padding: 14px 18px 14px;
+  }
+  .receipt-layout {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+  .receipt-journey,
+  .receipt-next,
+  .receipt-schedule,
+  .receipt-footer {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+  .receipt-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+/* ---- Standard receipt print template ----
+   A dedicated, print-only document — deliberately independent of the
+   on-screen page's theme/layout so "Download Receipt" always produces the
+   same clean, professional document regardless of viewport or app theme. */
+
+.receipt-print-template {
+  display: none;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .receipt-print-template,
+  .receipt-print-template * {
+    visibility: visible;
+  }
+
+  .receipt-print-template {
+    display: block;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    padding: 32px;
+    font-family: var(--font-family, Arial, sans-serif);
+    color: #172033;
+    background: #ffffff;
+  }
+}
+
+.receipt-print-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #172033;
+  margin-bottom: 20px;
+}
+
+.receipt-print-brand {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.receipt-print-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #667085;
+}
+
+.receipt-print-meta {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px 32px;
+  margin-bottom: 28px;
+}
+
+.receipt-print-meta div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.receipt-print-meta span {
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #667085;
+}
+
+.receipt-print-meta strong {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.receipt-print-section {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #667085;
+  margin: 24px 0 8px;
+}
+
+.receipt-print-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.receipt-print-table td {
+  padding: 8px 4px;
+  font-size: 0.9rem;
+  border-bottom: 1px solid #e8e9e5;
+}
+
+.receipt-print-table td:first-child {
+  color: #667085;
+}
+
+.receipt-print-table td:last-child {
+  text-align: right;
+  font-weight: 600;
+}
+
+.receipt-print-total td {
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.receipt-print-footer {
+  margin-top: 40px;
+  padding-top: 16px;
+  border-top: 1px solid #e8e9e5;
+  font-size: 0.78rem;
+  color: #667085;
+  text-align: center;
+}
+
+/* ==========================================
+   SIGN — full-width agreement/signing page.
+   Shares .aj-page's palette/topbar/hero and the same row/panel
+   primitives as Decision/Receipt for a 60/40 info-vs-action split.
+   ========================================== */
+
+.sign-page .aj-topbar,
+.sign-page .aj-hero {
+  max-width: none;
+}
+
+.sign-page .aj-hero {
+  border-bottom: 1px solid var(--aj-border);
+  padding-bottom: 24px;
+}
+
+.sign-layout {
+  max-width: none;
+  margin: 0 auto;
+  padding: 32px 24px 56px;
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 56px;
+  align-items: start;
+}
+
+.sign-section-heading {
+  margin-top: 28px;
+}
+
+.sign-terms-block {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid var(--aj-border);
+}
+
+.sign-terms-heading {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--aj-text-primary);
+  margin: 0 0 10px;
+}
+
+.sign-terms-list {
+  margin: 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sign-terms-list li {
+  font-size: 0.82rem;
+  color: var(--aj-text-secondary);
+  line-height: 1.55;
+}
+
+.sign-action-panel {
+  background: var(--aj-surface);
+  border: 1px solid var(--aj-border);
+  border-radius: 18px;
+  padding: 28px;
+}
+
+.sign-action-desc {
+  margin: 8px 0 20px;
+  font-size: 0.88rem;
+  color: var(--aj-text-secondary);
+  line-height: 1.55;
+}
+
+.sign-cta-block {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sign-cta-block .btn-primary {
+  width: 100%;
+}
+
+@media (max-width: 1024px) {
+  .sign-layout {
+    gap: 32px;
+    padding: 28px 20px 44px;
+  }
+}
+
+@media (max-width: 720px) {
+  .sign-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .sign-layout {
+    padding: 24px 18px 40px;
+  }
+  .sign-action-panel {
+    padding: 22px;
+  }
+}

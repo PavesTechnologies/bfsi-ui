@@ -1,8 +1,14 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useLocation, useNavigate, Navigate } from "react-router-dom";
 import { isFillDefaults } from "../config/env";
 import { toast } from "react-toastify";
 import apiClient from "../api/client";
-import Sidebar from "../components/Sidebar";
+import {
+  loadApplication,
+  saveApplication,
+  clearApplication,
+} from "../utils/applicationStorage";
+import AppShell from "../components/layout/AppShell";
 import Button from "../components/FormElements/Button";
 import ApplicantInfo from "../components/FormSteps/ApplicantInfo";
 import AssetsLiabilities from "../components/FormSteps/AssetsLiabilities";
@@ -18,6 +24,7 @@ import PipelineScreen from "../components/Pipeline/PipelineScreen";
 import SignatureScreen from "../components/Pipeline/SignatureScreen";
 import { callDisburse } from "../api/disbursementApi";
 import orchestratorClient from "../api/orchestratorClient";
+import { getDisbursementOutcome, normalizeReceipt, buildDeclinedDecision } from "../utils/disbursementReceipt";
 import "../styles/components.css";
 import "../styles/pipeline.css";
 
@@ -152,39 +159,84 @@ const initialFormData = isFillDefaults
     };
 
 const steps = [
-  { title: "Loan Details", description: "Basic loan information" },
-  { title: "Applicant Info", description: "Personal details" },
-  { title: "Address", description: "Contact information" },
-  { title: "Employment", description: "Work details" },
-  { title: "Additional Income", description: "Other income sources" },
-  { title: "Assets & Liabilities", description: "Financial overview" },
-  { title: "Review & Submit", description: "Final review" },
+  { path: "loan-details", title: "Loan Details", description: "Basic loan information" },
+  { path: "applicant-info", title: "Applicant Info", description: "Personal details" },
+  { path: "address", title: "Address", description: "Contact information" },
+  { path: "employment", title: "Employment", description: "Work details" },
+  { path: "income", title: "Additional Income", description: "Other income sources" },
+  { path: "assets-liabilities", title: "Assets & Liabilities", description: "Financial overview" },
+  { path: "review", title: "Review & Submit", description: "Final review" },
 ];
 
-const LoanIntake = () => {
-  const [currentStep, setCurrentStep] = useState(0);
-  const [isCollapsed, setIsCollapsed] = useState(false);
-  const [formData, setFormData] = useState(initialFormData);
-  const [applicationId, setApplicationId] = useState(null);
-  const [documentsComplete, setDocumentsComplete] = useState(false);
+const stepPath = (index) => `/apply/${steps[index].path}`;
+
+// Mirrors the original single-component if/else waterfall's priority order,
+// but expressed as "which route the current state implies" instead of
+// "which screen to render" — used to keep the URL in sync with app state,
+// and to recover cleanly on refresh (see applicationStorage.js).
+function resolveGatePath({
+  disbursementReceipt,
+  pipelinePhase,
+  applicationId,
+  pipelineComplete,
+  pipelineDecision,
+  documentsComplete,
+}) {
+  if (disbursementReceipt) return "/apply/receipt";
+  if (applicationId && pipelinePhase === "awaiting_signature") return "/apply/sign";
+  if (applicationId && pipelineComplete && pipelineDecision) return "/apply/decision";
+  if (applicationId && !documentsComplete) return "/apply/documents";
+  if (applicationId && documentsComplete && !pipelineComplete) return "/apply/processing";
+  return null; // no application in flight — the 7-step form is the active region
+}
+
+const ApplicationFlow = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const [saved] = useState(() => loadApplication());
+
+  const [formData, setFormData] = useState(() => saved?.formData || initialFormData);
+  const [applicationId, setApplicationId] = useState(() => saved?.applicationId || null);
+  const [documentsComplete, setDocumentsComplete] = useState(() => saved?.documentsComplete || false);
+  // Steps the user has successfully validated/saved — persists independently
+  // of which step is currently being viewed, so navigating back to review a
+  // completed step never disables steps completed after it.
+  const [completedSteps, setCompletedSteps] = useState(
+    () => new Set(saved?.completedSteps || []),
+  );
   const [pipelineComplete, setPipelineComplete] = useState(false);
   const [pipelineDecision, setPipelineDecision] = useState(null);
   const [disbursementLoading, setDisbursementLoading] = useState(false);
   const [disbursementReceipt, setDisbursementReceipt] = useState(null);
   const [pipelinePhase, setPipelinePhase] = useState(null); // 'awaiting_signature' | null
   const [acceptedTerms, setAcceptedTerms] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isTriggeringVerification, setIsTriggeringVerification] = useState(false);
+
+  // Debounced refresh-persistence — only the fields needed to resume the
+  // 7-step form or reconnect to an in-flight application are saved; anything
+  // downstream of the SSE pipeline is intentionally left in-memory only.
+  const saveTimer = useRef(null);
+  useEffect(() => {
+    if (saveTimer.current) clearTimeout(saveTimer.current);
+    saveTimer.current = setTimeout(() => {
+      saveApplication({
+        applicationId,
+        formData,
+        documentsComplete,
+        completedSteps: Array.from(completedSteps),
+      });
+    }, 400);
+    return () => clearTimeout(saveTimer.current);
+  }, [applicationId, formData, documentsComplete, completedSteps]);
 
   const resetApplication = useCallback(() => {
-    setApplicationId(null);
-    setDocumentsComplete(false);
-    setPipelineComplete(false);
-    setPipelineDecision(null);
-    setDisbursementLoading(false);
-    setDisbursementReceipt(null);
-    setPipelinePhase(null);
-    setAcceptedTerms(null);
-    setCurrentStep(0);
-    setFormData(initialFormData);
+    clearApplication();
+    // A hard reload (not just resetting state + SPA navigation) so every
+    // component remounts fresh — no leftover in-flight/loading state from
+    // whatever screen "Start New Application" was clicked from.
+    window.location.href = stepPath(0);
   }, []);
 
   const handleLoanChange = (e) => {
@@ -305,36 +357,60 @@ const LoanIntake = () => {
     return errors;
   };
 
+  const currentStepIndex = steps.findIndex((s) => location.pathname === `/apply/${s.path}`);
+
+  // The furthest step the user has unlocked so far: either the step they're
+  // currently viewing, or one past the last completed step — whichever is
+  // greater. This only ever grows (aside from an explicit reset), so
+  // navigating backward to review a completed step never shrinks it and
+  // never disables steps completed after it.
+  const furthestStepIndex = Math.max(
+    currentStepIndex,
+    completedSteps.size ? Math.max(...completedSteps) + 1 : 0,
+  );
+
+  const markStepCompleted = (stepIndex) => {
+    setCompletedSteps((prev) => {
+      if (prev.has(stepIndex)) return prev;
+      const next = new Set(prev);
+      next.add(stepIndex);
+      return next;
+    });
+  };
+
   const handleNext = () => {
-    const errors = validateStep(currentStep);
+    const errors = validateStep(currentStepIndex);
     if (errors.length > 0) {
       errors.forEach((msg) => toast.error(msg));
       return;
     }
-    if (currentStep < steps.length - 1) {
-      setCurrentStep((step) => step + 1);
+    markStepCompleted(currentStepIndex);
+    if (currentStepIndex < steps.length - 1) {
+      navigate(stepPath(currentStepIndex + 1));
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
   const handleBack = () => {
-    if (currentStep > 0) {
-      setCurrentStep((step) => step - 1);
+    if (currentStepIndex > 0) {
+      navigate(stepPath(currentStepIndex - 1));
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
   const handleStepClick = (stepIndex) => {
-    setCurrentStep(stepIndex);
+    // Defensive: only the active step and previously-completed/unlocked
+    // steps are navigable, regardless of how this is invoked (sidebar,
+    // review-screen "edit" links, etc).
+    if (stepIndex > furthestStepIndex) return;
+    navigate(stepPath(stepIndex));
     window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  const handleToggleCollapse = () => {
-    setIsCollapsed((value) => !value);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isSubmitting) return;
+    setIsSubmitting(true);
 
     const payload = {
       request_id: crypto.randomUUID(),
@@ -386,11 +462,13 @@ const LoanIntake = () => {
       const backendApplicationId =
         response.data.application_id || crypto.randomUUID();
 
+      markStepCompleted(currentStepIndex);
       setApplicationId(backendApplicationId);
       setDocumentsComplete(false);
       setPipelineComplete(false);
       setPipelineDecision(null);
       toast.success("Application submitted successfully!");
+      navigate("/apply/documents");
     } catch (error) {
       console.error("Loan submission failed:", error);
 
@@ -405,16 +483,21 @@ const LoanIntake = () => {
       } else {
         toast.error("Submission failed. Please try again.");
       }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handlePipelineComplete = useCallback((decision) => {
     setPipelineDecision(decision);
     setPipelineComplete(true);
-  }, []);
+    navigate("/apply/decision");
+  }, [navigate]);
 
   // Triggers orchestrator and advances to pipeline on success
   const handleDocumentsComplete = useCallback(async () => {
+    if (isTriggeringVerification) return;
+    setIsTriggeringVerification(true);
     // Build raw_application to match backend schema
     const { loan, applicant } = formData;
     const raw_application = {
@@ -446,11 +529,14 @@ const LoanIntake = () => {
       });
       setDocumentsComplete(true);
       toast.success("Documents uploaded successfully. Starting verification.");
+      navigate("/apply/processing");
     } catch (error) {
       console.error("Failed to trigger orchestrator:", error);
       toast.error("Failed to start verification. Please try again.");
+    } finally {
+      setIsTriggeringVerification(false);
     }
-  }, [applicationId, formData]);
+  }, [applicationId, formData, navigate, isTriggeringVerification]);
 
   const handleDecisionConfirm = useCallback(
     async (selectedTerms) => {
@@ -464,6 +550,7 @@ const LoanIntake = () => {
           );
           setAcceptedTerms(selectedTerms);
           setPipelinePhase("awaiting_signature");
+          navigate("/apply/sign");
         } catch (error) {
           console.error("Counter offer selection failed:", error);
           toast.error(
@@ -482,6 +569,7 @@ const LoanIntake = () => {
           await orchestratorClient.post(`/pipeline/${applicationId}/accept`);
           setAcceptedTerms(selectedTerms);
           setPipelinePhase("awaiting_signature");
+          navigate("/apply/sign");
         } catch (error) {
           console.error("Accept failed:", error);
           toast.error(
@@ -517,8 +605,22 @@ const LoanIntake = () => {
       setDisbursementLoading(true);
       try {
         const receipt = await callDisburse(payload);
-        setDisbursementReceipt(receipt);
+        const normalized = normalizeReceipt(receipt);
+
+        if (getDisbursementOutcome(normalized) === "failed") {
+          // Never let a failed disbursement masquerade as a success receipt.
+          toast.error(
+            normalized?.explanation ||
+              "Disbursement could not be completed. Please contact support.",
+          );
+          setPipelineDecision(buildDeclinedDecision(normalized, applicationId));
+          navigate("/apply/decision");
+          return;
+        }
+
+        setDisbursementReceipt(normalized);
         toast.success("Funds disbursed successfully!");
+        navigate("/apply/receipt");
       } catch (error) {
         console.error("Disbursement failed:", error);
         toast.error(
@@ -529,7 +631,7 @@ const LoanIntake = () => {
         setDisbursementLoading(false);
       }
     },
-    [applicationId, pipelineDecision],
+    [applicationId, pipelineDecision, navigate],
   );
 
   const handleDecisionDecline = useCallback(async () => {
@@ -554,8 +656,156 @@ const LoanIntake = () => {
     resetApplication();
   }, [applicationId, pipelineDecision, resetApplication]);
 
+  const gatePath = resolveGatePath({
+    disbursementReceipt,
+    pipelinePhase,
+    applicationId,
+    pipelineComplete,
+    pipelineDecision,
+    documentsComplete,
+  });
+
+  // Keep the URL in sync with what the current application state actually
+  // supports — mirrors the original if/else waterfall's priority order.
+  if (gatePath) {
+    if (location.pathname !== gatePath) {
+      return <Navigate to={gatePath} replace />;
+    }
+
+    if (gatePath === "/apply/receipt") {
+      // Owns its own full-width page shell, like Documents/Processing/the
+      // approved-decision page.
+      return (
+        <DisbursementReceiptScreen
+          receipt={disbursementReceipt}
+          onReset={resetApplication}
+        />
+      );
+    }
+
+    if (gatePath === "/apply/sign") {
+      // Owns its own full-width page shell, like Documents/Decision/Receipt.
+      return (
+        <SignatureScreen
+          applicationId={applicationId}
+          terms={acceptedTerms}
+          onComplete={(receipt) => {
+            const normalized = normalizeReceipt(receipt);
+            setPipelinePhase(null);
+
+            if (getDisbursementOutcome(normalized) === "failed") {
+              // Never let a failed disbursement masquerade as a success receipt.
+              toast.error(
+                normalized?.explanation ||
+                  "We couldn't complete disbursement after signing. Please contact support.",
+              );
+              setPipelineDecision(buildDeclinedDecision(normalized, applicationId));
+              navigate("/apply/decision");
+              return;
+            }
+
+            setDisbursementReceipt(normalized);
+            navigate("/apply/receipt");
+          }}
+        />
+      );
+    }
+
+    if (gatePath === "/apply/decision") {
+      if (disbursementLoading) {
+        const isAccepting =
+          pipelineDecision?.isNewCounterOfferFlow || pipelineDecision?.isHITLBankDecision;
+        return (
+          <div className="aj-page decision-page">
+            <div className="aj-topbar">
+              <button type="button" className="aj-topbar-btn" disabled>
+                <DecisionArrowLeftIcon /> Back
+              </button>
+              <button
+                type="button"
+                className="aj-topbar-btn"
+                onClick={() =>
+                  toast.info("Our support team is available in-app any time — we're here if you need us.")
+                }
+              >
+                Need Help?
+              </button>
+            </div>
+
+            <div className="decision-processing">
+              <span className="aj-orb" aria-hidden="true">
+                <span className="aj-orb-core" />
+              </span>
+              <h1 className="aj-hero-title">{isAccepting ? "Accepting Offer" : "Disbursing Funds"}</h1>
+              <p className="aj-hero-subtitle">
+                {isAccepting
+                  ? "Confirming your acceptance with the bank…"
+                  : "Executing fund transfer and generating your receipt…"}
+              </p>
+            </div>
+          </div>
+        );
+      }
+
+      // The approved-offer and declined branches own their own full-width
+      // page shell (like Documents/Processing); COUNTER_OFFER/DISBURSED/
+      // fallback still use the shared narrow-card shell.
+      if (pipelineDecision?.decision === "APPROVED" || pipelineDecision?.decision === "DECLINED") {
+        return (
+          <DecisionScreen
+            decision={pipelineDecision}
+            onConfirm={handleDecisionConfirm}
+            onDecline={handleDecisionDecline}
+            onReset={resetApplication}
+          />
+        );
+      }
+
+      return (
+        <div className="pipeline-page-shell">
+          <DecisionScreen
+            decision={pipelineDecision}
+            onConfirm={handleDecisionConfirm}
+            onDecline={handleDecisionDecline}
+            onReset={resetApplication}
+          />
+        </div>
+      );
+    }
+
+    if (gatePath === "/apply/documents") {
+      // A dedicated, full-width post-submission stage — DocumentUpload owns
+      // its entire page shell (header, layout, footer), not another step
+      // inside the 7-step form.
+      return (
+        <DocumentUpload
+          formData={formData}
+          onChange={handleChange}
+          applicationId={applicationId}
+          onContinue={handleDocumentsComplete}
+          isContinuing={isTriggeringVerification}
+        />
+      );
+    }
+
+    if (gatePath === "/apply/processing") {
+      return (
+        <PipelineScreen
+          key={applicationId}
+          applicationId={applicationId}
+          onComplete={handlePipelineComplete}
+        />
+      );
+    }
+  }
+
+  // No application in flight — the 7-step form is the active region.
+  if (currentStepIndex === -1) {
+    return <Navigate to={stepPath(0)} replace />;
+  }
+
   const renderStep = () => {
-    switch (currentStep) {
+    switch (currentStepIndex) {
       case 0:
         return (
           <LoanDetails formData={formData.loan} onChange={handleLoanChange} />
@@ -596,161 +846,51 @@ const LoanIntake = () => {
     }
   };
 
-  if (disbursementReceipt) {
-    return (
-      <div style={{ minHeight: "100vh", padding: "var(--spacing-2xl)" }}>
-        <DisbursementReceiptScreen
-          receipt={disbursementReceipt}
-          onReset={resetApplication}
-        />
-      </div>
-    );
-  }
-
-  if (applicationId && pipelinePhase === "awaiting_signature") {
-    return (
-      <div style={{ minHeight: "100vh", padding: "var(--spacing-2xl)" }}>
-        <SignatureScreen
-          applicationId={applicationId}
-          terms={acceptedTerms}
-          onComplete={(receipt) => {
-            setDisbursementReceipt(receipt);
-            setPipelinePhase(null);
-          }}
-        />
-      </div>
-    );
-  }
-
-  if (applicationId && pipelineComplete && pipelineDecision) {
-    if (disbursementLoading) {
-      return (
-        <div style={{ minHeight: "100vh", padding: "var(--spacing-2xl)" }}>
-          <div className="pipeline-shell fade-in">
-            <div
-              className="card decision-screen"
-              style={{ textAlign: "center" }}
-            >
-              <div className="decision-hero">
-                <span className="decision-badge">Processing</span>
-                <h2 className="card-title">
-                  {pipelineDecision?.isNewCounterOfferFlow || pipelineDecision?.isHITLBankDecision
-                    ? "Accepting Offer"
-                    : "Disbursing Funds"}
-                </h2>
-                <p className="card-subtitle">
-                  {pipelineDecision?.isNewCounterOfferFlow || pipelineDecision?.isHITLBankDecision
-                    ? "Confirming your acceptance with the bank…"
-                    : "Executing fund transfer and generating your receipt…"}
-                </p>
-              </div>
-              <div
-                style={{
-                  margin: "var(--spacing-xl) auto",
-                  width: 40,
-                  height: 40,
-                  border: "3px solid var(--border-color)",
-                  borderTopColor: "var(--primary-color)",
-                  borderRadius: "50%",
-                  animation: "spin 0.8s linear infinite",
-                }}
-              />
-            </div>
-          </div>
-        </div>
-      );
-    }
-
-    return (
-      <div style={{ minHeight: "100vh", padding: "var(--spacing-2xl)" }}>
-        <DecisionScreen
-          decision={pipelineDecision}
-          onConfirm={handleDecisionConfirm}
-          onDecline={handleDecisionDecline}
-          onReset={resetApplication}
-        />
-      </div>
-    );
-  }
-
-  if (applicationId && !documentsComplete) {
-    return (
-      <div style={{ minHeight: "100vh", padding: "var(--spacing-2xl)" }}>
-        <DocumentUpload
-          formData={formData}
-          onChange={handleChange}
-          applicationId={applicationId}
-          onContinue={handleDocumentsComplete}
-        />
-      </div>
-    );
-  }
-
-  if (applicationId && documentsComplete && !pipelineComplete) {
-    return (
-      <div style={{ minHeight: "100vh", padding: "var(--spacing-2xl)" }}>
-        <PipelineScreen
-          key={applicationId}
-          applicationId={applicationId}
-          onComplete={handlePipelineComplete}
-        />
-      </div>
-    );
-  }
-
   return (
-    <div style={{ display: "flex", minHeight: "100vh" }}>
-      <Sidebar
-        currentStep={currentStep}
-        steps={steps}
-        onStepClick={handleStepClick}
-        isCollapsed={isCollapsed}
-        onToggleCollapse={handleToggleCollapse}
-      />
+    <AppShell
+      steps={steps}
+      currentStep={currentStepIndex}
+      completedSteps={completedSteps}
+      furthestStepIndex={furthestStepIndex}
+      onStepClick={handleStepClick}
+    >
+      <form onSubmit={handleSubmit}>
+        {renderStep()}
 
-      <div
-        style={{
-          marginLeft: isCollapsed ? "60px" : "260px",
-          flex: 1,
-          padding: "var(--spacing-2xl)",
-          maxWidth: "1200px",
-          transition: "margin-left 0.3s ease-in-out",
-        }}
-      >
-        <form onSubmit={handleSubmit}>
-          {renderStep()}
-
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              marginTop: "var(--spacing-xl)",
-              gap: "var(--spacing-md)",
-            }}
+        <div className="app-shell-nav">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleBack}
+            disabled={currentStepIndex === 0 || isSubmitting}
           >
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={handleBack}
-              disabled={currentStep === 0}
-            >
-              Back
-            </Button>
+            Back
+          </Button>
 
-            {currentStep === 6 ? (
-              <Button type="submit" variant="primary">
-                Submit Form
-              </Button>
-            ) : (
-              <Button type="button" variant="primary" onClick={handleNext}>
-                Next
-              </Button>
-            )}
-          </div>
-        </form>
-      </div>
-    </div>
+          {currentStepIndex === steps.length - 1 ? (
+            <Button
+              type="submit"
+              variant="primary"
+              disabled={isSubmitting}
+              loading={isSubmitting}
+            >
+              {isSubmitting ? "Submitting…" : "Submit Application"}
+            </Button>
+          ) : (
+            <Button type="button" variant="primary" onClick={handleNext}>
+              Continue
+            </Button>
+          )}
+        </div>
+      </form>
+    </AppShell>
   );
 };
 
-export default LoanIntake;
+const DecisionArrowLeftIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+    <path d="M10 3 5 8l5 5" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+export default ApplicationFlow;

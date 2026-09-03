@@ -2,6 +2,7 @@ import React from 'react';
 import Input from '../FormElements/Input';
 import Select from '../FormElements/Select';
 import DatePicker from '../FormElements/DatePicker';
+import StepInfoLayout from './StepInfoLayout';
 import '../../styles/components.css';
 
 const ApplicantInfo = ({ formData, onChange }) => {
@@ -25,12 +26,10 @@ const ApplicantInfo = ({ formData, onChange }) => {
         {value:'NON_BINARY', label: 'Non-binary'},
     ];
     return (
-        <div className="card fade-in">
-            <div className="card-header">
-                <h2 className="card-title">Applicant Information</h2>
-                <p className="card-subtitle">Provide your personal details</p>
-            </div>
-
+        <StepInfoLayout
+            title="About You"
+            text="We use these details to verify your identity and personalize your application. Your PAN and Aadhaar are used only for verification."
+        >
             <Select
                 label="Applicant Role"
                 name="applicant_role"
@@ -204,7 +203,7 @@ onChange={(e) => {
                     required
                 />
             </div>
-        </div>
+        </StepInfoLayout>
     );
 };
 

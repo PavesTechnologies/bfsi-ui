@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Input from '../FormElements/Input';
 import Select from '../FormElements/Select';
+import StepInfoLayout from './StepInfoLayout';
 import '../../styles/components.css';
 
 const AddressInfo = ({ formData, onChange }) => {
@@ -88,12 +89,10 @@ const AddressInfo = ({ formData, onChange }) => {
     };
 
     return (
-        <div className="card fade-in">
-            <div className="card-header">
-                <h2 className="card-title">Address Information</h2>
-                <p className="card-subtitle">Provide your residential details</p>
-            </div>
-
+        <StepInfoLayout
+            title="Where You Live"
+            text="Your address helps us confirm your identity and is used for all official communication about your application."
+        >
             {addresses.map((address, index) => (
                 <div key={index} className="dynamic-list-item">
                     <div className="dynamic-list-header">
@@ -207,7 +206,7 @@ const AddressInfo = ({ formData, onChange }) => {
             <button className="btn-add" type="button" onClick={addAddress}>
                 + Add Another Address
             </button>
-        </div>
+        </StepInfoLayout>
     );
 };
 
